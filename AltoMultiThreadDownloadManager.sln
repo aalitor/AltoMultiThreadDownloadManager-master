@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AltoMultiThreadDownloadManager", "AltoMultiThreadDownloadManager\AltoMultiThreadDownloadManager.csproj", "{416D564A-A276-42F7-A287-24B836B211EC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Chrome Extension", "Chrome Extension", "{065B64B8-3792-40B2-B37E-F1DB4BDA9482}"
+	ProjectSection(SolutionItems) = preProject
+		manifest.json = manifest.json
+		myscript.js = myscript.js
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DownloadManagerPortal", "DownloadManagerPortal\DownloadManagerPortal.csproj", "{41AEADBC-AC13-4112-B4C7-9D7297F67AFF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{416D564A-A276-42F7-A287-24B836B211EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{416D564A-A276-42F7-A287-24B836B211EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{416D564A-A276-42F7-A287-24B836B211EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{416D564A-A276-42F7-A287-24B836B211EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41AEADBC-AC13-4112-B4C7-9D7297F67AFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41AEADBC-AC13-4112-B4C7-9D7297F67AFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41AEADBC-AC13-4112-B4C7-9D7297F67AFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41AEADBC-AC13-4112-B4C7-9D7297F67AFF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

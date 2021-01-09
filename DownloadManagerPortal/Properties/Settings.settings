@@ -1,0 +1,15 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="DownloadManagerPortal.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="DownloadList" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ChromeExtensionName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">com.alto.multithreaddownloadmanager</Value>
+    </Setting>
+    <Setting Name="ChromeExtensionId" Type="System.String" Scope="User">
+      <Value Profile="(Default)">lmmjhgihkikoiieafpbmgacfhcappehb</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
