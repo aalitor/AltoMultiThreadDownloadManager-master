@@ -46,5 +46,10 @@ namespace DownloadManagerPortal.DownloadHandler
             }
             this.Close();
         }
+
+        private void btnOpenFile_Click_1(object sender, EventArgs e)
+        {
+
+        }
     }
 }

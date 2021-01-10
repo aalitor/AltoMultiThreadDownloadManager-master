@@ -25,8 +25,7 @@ namespace DownloadManagerPortal.DownloadHandler
         public MultiThreadDownloadOrganizer dorg = null;
         AsyncOperation aop;
         public bool waitingNewUrl;
-        public WaitingNewUrl WaiterForm { get; set; }
-
+        public DownloadInfo OldInfo { get; set; }
         public DownloadHandlerForm(MultiThreadDownloadOrganizer mtdobj)
         {
             //
@@ -131,6 +130,8 @@ namespace DownloadManagerPortal.DownloadHandler
         }
         void MainForm_Load(object sender, EventArgs e)
         {
+            DoubleBuffering.SetDoubleBuffered(listView1);
+            timer1.Start();
             this.FormClosing += DownloadHandlerForm_FormClosing;
             if (MTDO != null)
             {
@@ -142,6 +143,13 @@ namespace DownloadManagerPortal.DownloadHandler
                 dorg.Start();
             }
 
+            for (int i = 0; i < 32; i++)
+            {
+                var lvi = new ListViewItem((i + 1).ToString());
+                lvi.SubItems.Add("");
+                lvi.SubItems.Add("");
+                listView1.Items.Add(lvi);
+            }
         }
 
 
@@ -150,38 +158,43 @@ namespace DownloadManagerPortal.DownloadHandler
             var ex = e.GetException();
             if (ex is RemoteFilePropertiesChangedException)
             {
-                var dialogResult = MessageBox.Show("Url was expired. A new tab will be opened in browser to refresh the link. AltoDownloadManager will capture the link automatically"
-                    , "Refresh download link", MessageBoxButtons.YesNo);
-                if (dialogResult == System.Windows.Forms.DialogResult.No)
-                {
-                    this.Close();
-                    return;
-                }
-                waitingNewUrl = true;
-                this.Hide();
-                WaiterForm = new WaitingNewUrl(dorg.Info != null ? dorg.Info.ServerFileName : "");
-                WaiterForm.FormClosed += WaiterForm_FormClosed;
-                
-                Process.Start(dorg.DownloadRequestMessage.TabUrl);
-                WaiterForm.Shown += (m, n) => WaiterForm.Activate();
-                WaiterForm.ShowDialog(null);
+                requestNewUrl();
             }
             else
             {
-                dorg.Stop();
                 var webex = (WebException)ex;
-                if (webex != null)
+                if (webex == null)
+                    return;
+                var response = (HttpWebResponse)webex.Response;
+                if (response != null)
                 {
-                    MessageBox.Show(webex.Response.Headers[HttpResponseHeader.RetryAfter]);
+                    var status = response.StatusCode;
+                    if (status == HttpStatusCode.Forbidden &&
+                        OldInfo != null && !OldInfo.Equals(dorg.Info))
+                    {
+                        requestNewUrl();
+                    }
                 }
-                MessageBox.Show(ex.Message + " " + ex.StackTrace);
             }
         }
+        void requestNewUrl()
+        {
+            var dialogResult = MessageBox.Show("Url was expired. A new tab will be opened in browser to refresh the link. AltoDownloadManager will capture the link automatically"
+                    , "Refresh download link", MessageBoxButtons.YesNo);
+            if (dialogResult == System.Windows.Forms.DialogResult.No)
+            {
+                this.Close();
+                return;
+            }
+            waitingNewUrl = true;
+            this.Hide();
 
+            Process.Start(dorg.DownloadRequestMessage.TabUrl);
+        }
         void WaiterForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             waitingNewUrl = false;
-            
+
             this.Close();
         }
         void btnStart_Click(object sender, EventArgs e)
@@ -224,7 +237,7 @@ namespace DownloadManagerPortal.DownloadHandler
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + " " + ex.StackTrace);
+                
             }
         }
         void dorg_Completed(object sender, EventArgs e)
@@ -318,10 +331,17 @@ namespace DownloadManagerPortal.DownloadHandler
 
         private void timer1_Tick(object sender, EventArgs e)
         {
+
             try
             {
-                //Create bars to represent downloaded segments
-                //Need totalbytesreceived and start offset to calculate scale and drawing
+                var list = dorg.Ranges.OrderByDescending(x => x.LastTry).Take(dorg.NofThread).ToList();
+                for (int i = 0; i < list.Count; i++)
+                {
+                    var r = list[i];
+
+                    listView1.Items[i].SubItems[1].Text = r.TotalBytesReceived.ToHumanReadableSize();
+                    listView1.Items[i].SubItems[2].Text = r.Status.ToString();
+                }
             }
             catch
             {

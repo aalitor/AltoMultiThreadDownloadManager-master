@@ -109,7 +109,7 @@ namespace AltoMultiThreadDownloadManager
                 return Path.Combine(SaveDir, FileId);
             }
         }
-
+        public DateTime LastTry { get; set; }
 
         public string LastChecksum { get; set; }
 

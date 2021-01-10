@@ -36,6 +36,9 @@
     <StartupObject>DownloadManagerPortal.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AltoControls">
+      <HintPath>..\..\..\AppData\Local\Temp\Rar$DRa3268.36179\lib\AltoControls.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -54,6 +57,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChromeIntegrator\NativeMessageHost.cs" />
+    <Compile Include="DoubleBuffering.cs" />
+    <Compile Include="DownloadCenterForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DownloadCenterForm.Designer.cs">
+      <DependentUpon>DownloadCenterForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DownloaderControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DownloaderControl.Designer.cs">
+      <DependentUpon>DownloaderControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="DownloadHandler\UIControls\Bar.cs" />
     <Compile Include="DownloadHandler\Download Completed Form.cs">
       <SubType>Form</SubType>
@@ -78,14 +94,9 @@
     <Compile Include="EnterUrlForm.Designer.cs">
       <DependentUpon>EnterUrlForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="MessageHelper.cs" />
     <Compile Include="SingleInstance\App.cs" />
     <Compile Include="SingleInstance\AppManager.cs" />
-    <Compile Include="MainForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="MainForm.Designer.cs">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="SingleInstance\ISingleInstanceEnforcer.cs" />
     <Compile Include="SingleInstance\MessageEventArgs.cs" />
     <Compile Include="Program.cs" />
@@ -99,6 +110,12 @@
     <Compile Include="WaitingNewUrl.Designer.cs">
       <DependentUpon>WaitingNewUrl.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="DownloadCenterForm.resx">
+      <DependentUpon>DownloadCenterForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DownloaderControl.resx">
+      <DependentUpon>DownloaderControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DownloadHandler\Download Completed Form.resx">
       <DependentUpon>Download Completed Form.cs</DependentUpon>
     </EmbeddedResource>
@@ -107,9 +124,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="EnterUrlForm.resx">
       <DependentUpon>EnterUrlForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="MainForm.resx">
-      <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

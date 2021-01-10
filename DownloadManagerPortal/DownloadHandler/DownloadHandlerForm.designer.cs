@@ -70,14 +70,21 @@ namespace DownloadManagerPortal.DownloadHandler
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.lblThreads = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
+            this.listView1 = new System.Windows.Forms.ListView();
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.segmentedProgressBar1 = new DownloadManagerPortal.DownloadHandler.UIControls.SegmentedProgressBar();
             this.SuspendLayout();
             // 
             // txtUrl
             // 
+            this.txtUrl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtUrl.Location = new System.Drawing.Point(48, 12);
             this.txtUrl.Name = "txtUrl";
-            this.txtUrl.Size = new System.Drawing.Size(373, 20);
+            this.txtUrl.Size = new System.Drawing.Size(439, 20);
             this.txtUrl.TabIndex = 0;
             // 
             // btnStart
@@ -137,7 +144,7 @@ namespace DownloadManagerPortal.DownloadHandler
             // lblProgress
             // 
             this.lblProgress.AutoSize = true;
-            this.lblProgress.Location = new System.Drawing.Point(251, 101);
+            this.lblProgress.Location = new System.Drawing.Point(332, 101);
             this.lblProgress.Name = "lblProgress";
             this.lblProgress.Size = new System.Drawing.Size(0, 13);
             this.lblProgress.TabIndex = 4;
@@ -145,7 +152,7 @@ namespace DownloadManagerPortal.DownloadHandler
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(194, 101);
+            this.label2.Location = new System.Drawing.Point(275, 101);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(51, 13);
             this.label2.TabIndex = 4;
@@ -154,7 +161,7 @@ namespace DownloadManagerPortal.DownloadHandler
             // lblSpeed
             // 
             this.lblSpeed.AutoSize = true;
-            this.lblSpeed.Location = new System.Drawing.Point(241, 131);
+            this.lblSpeed.Location = new System.Drawing.Point(322, 131);
             this.lblSpeed.Name = "lblSpeed";
             this.lblSpeed.Size = new System.Drawing.Size(0, 13);
             this.lblSpeed.TabIndex = 4;
@@ -162,7 +169,7 @@ namespace DownloadManagerPortal.DownloadHandler
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(194, 131);
+            this.label4.Location = new System.Drawing.Point(275, 131);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(41, 13);
             this.label4.TabIndex = 4;
@@ -170,15 +177,18 @@ namespace DownloadManagerPortal.DownloadHandler
             // 
             // progressBar1
             // 
+            this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.progressBar1.Location = new System.Drawing.Point(48, 179);
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(373, 23);
+            this.progressBar1.Size = new System.Drawing.Size(439, 23);
             this.progressBar1.TabIndex = 6;
             // 
             // lblTotalBytes
             // 
             this.lblTotalBytes.AutoSize = true;
-            this.lblTotalBytes.Location = new System.Drawing.Point(286, 157);
+            this.lblTotalBytes.Location = new System.Drawing.Point(367, 157);
             this.lblTotalBytes.Name = "lblTotalBytes";
             this.lblTotalBytes.Size = new System.Drawing.Size(0, 13);
             this.lblTotalBytes.TabIndex = 4;
@@ -186,7 +196,7 @@ namespace DownloadManagerPortal.DownloadHandler
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(194, 157);
+            this.label5.Location = new System.Drawing.Point(275, 157);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(85, 13);
             this.label5.TabIndex = 4;
@@ -214,21 +224,57 @@ namespace DownloadManagerPortal.DownloadHandler
             this.label6.TabIndex = 4;
             this.label6.Text = "Nof Active Threads:";
             // 
+            // listView1
+            // 
+            this.listView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2,
+            this.columnHeader3});
+            this.listView1.FullRowSelect = true;
+            this.listView1.Location = new System.Drawing.Point(48, 239);
+            this.listView1.Name = "listView1";
+            this.listView1.Size = new System.Drawing.Size(439, 229);
+            this.listView1.TabIndex = 7;
+            this.listView1.UseCompatibleStateImageBehavior = false;
+            this.listView1.View = System.Windows.Forms.View.Details;
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "Id";
+            this.columnHeader1.Width = 40;
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "Total Bytes";
+            this.columnHeader2.Width = 129;
+            // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "Status";
+            this.columnHeader3.Width = 96;
+            // 
             // segmentedProgressBar1
             // 
+            this.segmentedProgressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.segmentedProgressBar1.BackColor = System.Drawing.SystemColors.ControlLight;
             this.segmentedProgressBar1.Bars = new DownloadManagerPortal.DownloadHandler.UIControls.Bar[0];
             this.segmentedProgressBar1.ContentLength = ((long)(100));
             this.segmentedProgressBar1.Location = new System.Drawing.Point(48, 212);
             this.segmentedProgressBar1.Name = "segmentedProgressBar1";
-            this.segmentedProgressBar1.Size = new System.Drawing.Size(373, 20);
+            this.segmentedProgressBar1.Size = new System.Drawing.Size(439, 20);
             this.segmentedProgressBar1.TabIndex = 5;
             // 
             // DownloadHandlerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(455, 241);
+            this.ClientSize = new System.Drawing.Size(497, 480);
+            this.Controls.Add(this.listView1);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.segmentedProgressBar1);
             this.Controls.Add(this.label5);
@@ -259,5 +305,9 @@ namespace DownloadManagerPortal.DownloadHandler
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Label lblThreads;
         private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.ListView listView1;
+        private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.ColumnHeader columnHeader3;
     }
 }

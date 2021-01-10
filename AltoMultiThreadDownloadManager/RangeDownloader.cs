@@ -55,7 +55,7 @@ namespace AltoMultiThreadDownloadManager
                 var chunkEndOffset = stOffset + 1 * 1024 * 1000 - 1;
                 var endOffset = UseChunk ? Math.Min(chunkEndOffset, Range.End) : Range.End;
                 Range.Status = Status = State.SendRequest;
-
+                Range.LastTry = DateTime.Now;
                 request = Info != null ?
                     RequestHelper.CreateHttpRequest(Info, stOffset, endOffset, BeforeSendingRequest) :
                     RequestHelper.CreateHttpRequest(Url, BeforeSendingRequest, true);
@@ -68,8 +68,8 @@ namespace AltoMultiThreadDownloadManager
                     Range.Status = Status = State.GetResponseStream;
 
                     ResponseReceived.Raise(this, new ResponseReceivedEventArgs(response));
+                    Logger.Write("Range path: " + Range.FilePath);
                     using (fileStream = FileHelper.CheckFile(Range.FilePath, Range.TotalBytesReceived > 0))
-                    //using (var fileStream = File.Open(Range.FilePath, FileMode.Append, FileAccess.Write))
                     {
                         using (var str = response.GetResponseStream())
                         {
@@ -79,73 +79,74 @@ namespace AltoMultiThreadDownloadManager
                             while (true)
                             {
 
-                                lock (GlobalLock.Locker)
+
+                                if (str != null)
+                                    bytesRead = str.Read(buffer, 0, buffer.Length);
+                                if (Info.ContentSize > 0)
+                                    bytesRead = (int)Math.Min(Range.Size - Range.TotalBytesReceived, bytesRead);
+                                if (bytesRead <= 0)
                                 {
-                                    if (str != null)
-                                        bytesRead = str.Read(buffer, 0, buffer.Length);
-                                    if (Info.ContentSize > 0)
-                                        bytesRead = (int)Math.Min(Range.Size - Range.TotalBytesReceived, bytesRead);
-                                    if (bytesRead <= 0)
-                                    {
-                                        endOfStream = true;
-                                        break;
+                                    endOfStream = true;
+                                    break;
 
-                                    }
-                                    if (stopFlag)
-                                    {
-                                        break;
-
-                                    }
-                                    if (Info != null && Info.ContentSize > 0 && Range.IsDownloaded)
-                                    {
-                                        break;
-                                    }
-                                    Range.Status = Status = State.Downloading;
-
-                                    fileStream.Write(buffer, 0, bytesRead);
-                                    fileStream.Flush();
-
-                                    Range.TotalBytesReceived += bytesRead;
-                                    ProgressChanged.Raise(this, EventArgs.Empty);
                                 }
+                                if (stopFlag)
+                                {
+                                    break;
+
+                                }
+                                if (Info != null && Info.ContentSize > 0 && Range.IsDownloaded)
+                                {
+                                    break;
+                                }
+                                Range.Status = Status = State.Downloading;
+
+                                fileStream.Write(buffer, 0, bytesRead);
+
+                                Range.TotalBytesReceived += bytesRead;
+                                ProgressChanged.Raise(this, EventArgs.Empty);
+
                             }
                         }
                     }
                 }
-                if ((!stopFlag && endOfStream && Info.ContentSize < 1) ||
-                    (Info.ContentSize > 0 && Range.IsDownloaded))
+                lock (GlobalLock.Locker)
                 {
-                    Range.Status = Status = State.Completed;
-                    Completed.Raise(this, EventArgs.Empty);
-                }
-                else if (stopFlag)
-                {
-                    Range.Status = Status = State.Stopped;
-                    Stopped.Raise(this, EventArgs.Empty);
+                    Range.LastTry = DateTime.Now;
+                    if ((!stopFlag && endOfStream && Info.ContentSize < 1) ||
+                        (Info.ContentSize > 0 && Range.IsDownloaded))
+                    {
+                        Range.Status = Status = State.Completed;
+                        Completed.Raise(this, EventArgs.Empty);
+                    }
+                    else if (stopFlag)
+                    {
+                        Range.Status = Status = State.Stopped;
+                        Stopped.Raise(this, EventArgs.Empty);
+                    }
                 }
             }
             catch (Exception ex)
             {
-                if (Info != null && Info.ContentSize > 0 && Range.IsDownloaded)
+                lock (GlobalLock.Locker)
                 {
-                    Range.Status = Status = State.Completed;
-                    Completed.Raise(this, EventArgs.Empty);
+                    Range.LastTry = DateTime.Now;
+                    if (Info != null && Info.ContentSize > 0 && Range.IsDownloaded)
+                    {
+                        Range.Status = Status = State.Completed;
+                        Completed.Raise(this, EventArgs.Empty);
+                    }
+                    else if (stopFlag)
+                    {
+                        Range.Status = Status = State.Stopped;
+                        Stopped.Raise(this, EventArgs.Empty);
+                    }
+                    else
+                    {
+                        Range.Status = Status = State.Failed;
+                        Failed.Raise(this, new ErrorEventArgs(ex));
+                    }
                 }
-                else if (stopFlag)
-                {
-                    Range.Status = Status = State.Stopped;
-                    Stopped.Raise(this, EventArgs.Empty);
-                }
-                else
-                {
-                    Range.Status = Status = State.Failed;
-                    Failed.Raise(this, new ErrorEventArgs(ex));
-                }
-                //else
-                //{
-                //    Range.Status = Status = State.Failed;
-                //    Failed.Raise(this, new ErrorEventArgs(e));
-                //}
             }
             finally
             {
@@ -164,8 +165,6 @@ namespace AltoMultiThreadDownloadManager
             stopFlag = true;
             if (request != null)
                 request.Abort();
-            if (th != null)
-                th.Abort();
         }
         private volatile bool stopFlag;
         public int TryCount { get; set; }

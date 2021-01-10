@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace DownloadManagerPortal.DownloadHandler
+namespace DownloadManagerPortal
 {
     public partial class WaitingNewUrl : Form
     {

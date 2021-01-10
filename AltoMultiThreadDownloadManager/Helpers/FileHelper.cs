@@ -24,12 +24,12 @@ namespace AltoMultiThreadDownloadManager.Helpers
             {
                 if (!exists) throw new Exception("File not exists to resume");
 
-                else return new FileStream(filePath, FileMode.Append, FileAccess.Write);
+                else return new FileStream(filePath, FileMode.Append);
             }
             else
             {
-                if (!exists) return new FileStream(filePath, FileMode.Create, FileAccess.ReadWrite);
-                else return new FileStream(filePath, FileMode.Truncate, FileAccess.ReadWrite);
+                if (!exists) return new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read);
+                else return new FileStream(filePath, FileMode.Truncate, FileAccess.Write, FileShare.Read);
             }
         }
 

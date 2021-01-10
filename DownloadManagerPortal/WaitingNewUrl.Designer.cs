@@ -1,4 +1,4 @@
-﻿namespace DownloadManagerPortal.DownloadHandler
+﻿namespace DownloadManagerPortal
 {
     partial class WaitingNewUrl
     {
@@ -50,14 +50,14 @@
             this.lblDescription.Size = new System.Drawing.Size(0, 13);
             this.lblDescription.TabIndex = 1;
             // 
-            // Waiting_New_Url
+            // WaitingNewUrl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(342, 77);
             this.Controls.Add(this.lblDescription);
             this.Controls.Add(this.btnCancel);
-            this.Name = "Waiting_New_Url";
+            this.Name = "WaitingNewUrl";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Refresh url ";
             this.ResumeLayout(false);

@@ -59,6 +59,7 @@
     <Compile Include="AssociatedIcons\IconListManager.cs" />
     <Compile Include="AssociatedIcons\Shell32.cs" />
     <Compile Include="AssociatedIcons\User32.cs" />
+    <Compile Include="DownloaderStatus.cs" />
     <Compile Include="DownloadInfo.cs" />
     <Compile Include="EventArguments\AfterGettingResponseEventArgs.cs" />
     <Compile Include="EventArguments\BeforeSendingRequestEventArgs.cs" />
@@ -66,6 +67,7 @@
     <Compile Include="EventArguments\MergingProgressChangedEventArgs.cs" />
     <Compile Include="EventArguments\ProgressChangedEventArgs.cs" />
     <Compile Include="EventArguments\ResponseReceivedEventArgs.cs" />
+    <Compile Include="EventArguments\StatusChangedEventArgs.cs" />
     <Compile Include="Exceptions\FileValidationFailedException.cs" />
     <Compile Include="Exceptions\RemoteFilePropertiesChangedException.cs" />
     <Compile Include="Helpers\FileHelper.cs" />

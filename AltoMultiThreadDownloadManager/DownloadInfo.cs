@@ -97,5 +97,9 @@ namespace AltoMultiThreadDownloadManager
                     ContentSize.GetHashCode() ^
                     ServerFileName.GetHashCode();
         }
+        public DownloadInfo Clone()
+        {
+            return new DownloadInfo(Url, ContentSize, AcceptRanges, ServerFileName);
+        }
     }
 }

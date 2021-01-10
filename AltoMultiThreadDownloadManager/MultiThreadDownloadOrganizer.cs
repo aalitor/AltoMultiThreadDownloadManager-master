@@ -13,6 +13,7 @@ using AltoMultiThreadDownloadManager.Exceptions;
 using SC = System.ComponentModel;
 using Newtonsoft.Json;
 using System.Threading;
+using System.Windows.Forms;
 
 // ReSharper disable All
 namespace AltoMultiThreadDownloadManager
@@ -62,6 +63,8 @@ namespace AltoMultiThreadDownloadManager
         /// Raised when file validation progress changed
         /// </summary>
         public event EventHandler<ChecksumValidationProgressChangedEventArgs> ChecksumValidationProgressChanged;
+        public event EventHandler<StatusChangedEventArgs> StatusChanged;
+        private DownloaderStatus status;
         private Stopwatch stp = new Stopwatch();
         private bool flagStop = false;
         private List<RangeDownloader> cdList = new List<RangeDownloader>();
@@ -97,21 +100,24 @@ namespace AltoMultiThreadDownloadManager
         {
             if (Info.ContentSize < 1)
             {
-                Stop();
+                Status = DownloaderStatus.MergingFiles;
                 File.Delete(this.FilePath);
                 File.Move(Ranges[0].FilePath, this.FilePath);
                 Progress = 100;
+                Status = DownloaderStatus.Completed;
                 Completed.Raise(this, EventArgs.Empty, aop);
             }
             else if (Ranges.All(x => x.IsDownloaded) &&
+                Ranges.All(x => x.IsIdle) &&
                       TotalBytesReceived == Info.ContentSize &&
                       !flagMerged)
             {
-                Stop();
                 flagMerged = true;
                 Progress = 100;
+                Status = DownloaderStatus.MergingFiles;
                 await MergePartialFiles();
                 ProgressChanged.Raise(this, new ProgressChangedEventArgs(Progress), aop);
+                Status = DownloaderStatus.Completed;
                 Completed.Raise(this, EventArgs.Empty, aop);
             }
             else
@@ -126,6 +132,7 @@ namespace AltoMultiThreadDownloadManager
             {
                 LastTry = DateTime.Now;
                 stopTimer.Stop();
+                Status = DownloaderStatus.Stopped;
                 Stopped.Raise(this, EventArgs.Empty, aop);
             }
 
@@ -165,15 +172,15 @@ namespace AltoMultiThreadDownloadManager
             if (Info == null)
             {
                 Info = DownloadInfo.GetFromResponse(e.Response, Url);
-                cd.Info = Info;
+                LastInfo = Info.Clone();
+                cd.Info = Info.Clone();
                 var chunkedHeader = e.Response.Headers[HttpResponseHeader.TransferEncoding];
                 UseChunk = chunkedHeader != null && chunkedHeader.ToLower() == "chunked";
                 Ranges.First().End = Info.ContentSize - 1;
                 NofThread = Info.AcceptRanges ? NofThread : 1;
-                DownloadInfoReceived.Raise(this, EventArgs.Empty, aop);
+                DownloadInfoReceived.Raise(this, EventArgs.Empty);
             }
             var r = Ranges.First(x => x.FileId == cd.Range.FileId);
-
             createNewThreadIfRequired();
         }
 
@@ -188,11 +195,14 @@ namespace AltoMultiThreadDownloadManager
 
             if (Progress == 0 || prnew != Progress)
             {
+                Status = DownloaderStatus.Downloading;
                 Progress = prnew;
                 ProgressChanged.Raise(this, new ProgressChangedEventArgs(Progress), aop);
             }
         }
         #endregion
+
+
         #region User methods
 
         /// <summary>
@@ -249,7 +259,6 @@ namespace AltoMultiThreadDownloadManager
                         new RemoteFilePropertiesChangedException(this.Info, currentInfo)), aop);
                 return;
             }
-
             speedBytesOffset = TotalBytesReceived;
             flagStop = false;
             stp.Reset();
@@ -258,7 +267,14 @@ namespace AltoMultiThreadDownloadManager
             Resumed.Raise(this, EventArgs.Empty, aop);
 
         }
+        public bool CheckUrlStillValid()
+        {
+            var currentInfo = getCurrentInformations();
 
+            if (currentInfo == null || !currentInfo.Equals(this.Info))
+                return false;
+            return true;
+        }
         public MultiThreadDownloadOrganizer Clone()
         {
             var json = JsonConvert.SerializeObject(this);
@@ -268,7 +284,7 @@ namespace AltoMultiThreadDownloadManager
 
         #region Helper methods
 
-        DownloadInfo getCurrentInformations()
+        public DownloadInfo getCurrentInformations()
         {
             try
             {
@@ -374,44 +390,32 @@ namespace AltoMultiThreadDownloadManager
         {
             return Task.Run(() =>
                 {
-                    lock (GlobalLock.Locker)
+
+                    using (var fs = File.Create(FilePath))
                     {
-                        using (var fs = File.Create(FilePath))
+                        foreach (var fileChunk in Ranges.Where(x => x.TotalBytesReceived > 0).OrderBy(x => x.Start)
+                    .Select(x => x.FilePath))
                         {
-                            foreach (var fileChunk in Ranges.Where(x => x.TotalBytesReceived > 0).OrderBy(x => x.Start)
-                        .Select(x => x.FilePath))
+                            var buffer = new byte[5 * 1024];
+                            FileStream chunkStrem;
+                            while (!TryOpen(fileChunk, out chunkStrem))
                             {
-                                var buffer = new byte[5 * 1024];
-                                FileStream chunkStrem;
-                                while (!TryOpen(fileChunk, out chunkStrem))
-                                {
-                                    Thread.Sleep(100);
-                                }
-                                WriteFile(chunkStrem, fs);
+                                Thread.Sleep(500);
                             }
-
-                            foreach (var r in Ranges)
-                            {
-                                File.Delete(r.FilePath);
-                            }
-                            MergeCompleted.Raise(this, EventArgs.Empty, aop);
+                            WriteFile(chunkStrem, fs);
                         }
-
+                        MergeCompleted.Raise(this, EventArgs.Empty, aop);
                     }
+
+
                 });
         }
         private bool TryOpen(string fileChunk, out FileStream fs)
         {
-            try
-            {
-                fs = File.Open(fileChunk, FileMode.Open, FileAccess.Read);
-                return true;
-            }
-            catch
-            {
-                fs = null;
-                return false;
-            }
+
+            fs = File.Open(fileChunk, FileMode.Open, FileAccess.Read, FileShare.Read);
+            return true;
+
         }
         private bool WriteFile(FileStream chunkStream, FileStream fs)
         {
@@ -444,7 +448,8 @@ namespace AltoMultiThreadDownloadManager
         {
             get
             {
-                return Ranges.ToList().Sum(x => x.TotalBytesReceived);
+                return Ranges != null && Ranges.Any() ?
+                    Ranges.ToList().Sum(x => x.TotalBytesReceived) : 0;
             }
         }
         /// <summary>
@@ -473,12 +478,29 @@ namespace AltoMultiThreadDownloadManager
                 return Progress.ToString("0.00") + "%";
             }
         }
+        public DownloaderStatus Status
+        {
+            get
+            {
+                return status;
+            }
+            set
+            {
+                if (value != status)
+                {
+                    var old = status;
+                    status = value;
+                    StatusChanged.Raise(this, new StatusChangedEventArgs(old, status), aop);
+                }
+            }
+        }
         public int NofActiveThreads
         {
             get
             {
                 lock (GlobalLock.Locker)
-                    return Ranges.ToList().Count(x => !x.IsIdle);
+                    return Ranges != null && Ranges.Any() ?
+                        Ranges.ToList().Count(x => !x.IsIdle) : 0;
             }
         }
 
@@ -514,7 +536,7 @@ namespace AltoMultiThreadDownloadManager
         /// e.g Chrome extension
         /// </summary>
         public DownloadMessage DownloadRequestMessage { get; set; }
-
+        public DownloadInfo LastInfo { get; set; }
         public DateTime LastTry { get; set; }
         #endregion
     }

@@ -48,7 +48,7 @@ namespace DownloadManagerPortal.SingleInstancing
         {
             get
             {
-                return (MainForm)tracker.Enforcer;
+                return (DownloadCenterForm)tracker.Enforcer;
             }
         }
 
@@ -59,7 +59,7 @@ namespace DownloadManagerPortal.SingleInstancing
 
         private ISingleInstanceEnforcer GetSingleInstanceEnforcer()
         {
-            return new MainForm();
+            return new DownloadCenterForm();
         }
 
         public void Dispose()
@@ -79,7 +79,6 @@ namespace DownloadManagerPortal.SingleInstancing
                 tracker.SendMessageToFirstInstance(json);
             }
         }
-        public static List<DownloadHandlerForm> formList = new List<DownloadHandlerForm>();
         public void Start(string[] args, DownloadMessage msg)
         {
             Application.EnableVisualStyles();
@@ -99,26 +98,26 @@ namespace DownloadManagerPortal.SingleInstancing
                         return;
                     try
                     {
-                        MainForm form = (MainForm)tracker.Enforcer;
+                        DownloadCenterForm form = (DownloadCenterForm)tracker.Enforcer;
 
                         //form.downloadList1.AddDownloadURLs(ResourceLocation.FromURLArray(args), 1, null, 0);
 
-                        if (Array.IndexOf<string>(args, "/as") >= 0)
-                        {
-                            form.WindowState = FormWindowState.Minimized;
-                        }
+                        //if (Array.IndexOf<string>(args, "/as") >= 0)
+                        //{
+                        //    form.WindowState = FormWindowState.Minimized;
+                        //}
 
-                        form.Load += delegate(object sender, EventArgs e)
-                            {
+                        //form.Load += delegate(object sender, EventArgs e)
+                        //    {
 
-                                if (form.WindowState == FormWindowState.Minimized)
-                                {
-                                }
+                        //        if (form.WindowState == FormWindowState.Minimized)
+                        //        {
+                        //        }
 
-                                if (args.Length > 0)
-                                {
-                                }
-                            };
+                        //        if (args.Length > 0)
+                        //        {
+                        //        }
+                        //    };
 
                         form.FormClosing += delegate(object sender, FormClosingEventArgs e)
                             {
@@ -142,8 +141,6 @@ namespace DownloadManagerPortal.SingleInstancing
             }
             catch (SingleInstancingException ex)
             {
-                MessageBox.Show("Could not create a SingleInstanceTracker object:\n" + ex.Message + "\nApplication will now terminate.\n" + ex.InnerException.ToString());
-
                 return;
             }
             finally
