@@ -71,18 +71,6 @@
       <DependentUpon>DownloaderControl.cs</DependentUpon>
     </Compile>
     <Compile Include="DownloadHandler\UIControls\Bar.cs" />
-    <Compile Include="DownloadHandler\Download Completed Form.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DownloadHandler\Download Completed Form.designer.cs">
-      <DependentUpon>Download Completed Form.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DownloadHandler\DownloadHandlerForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DownloadHandler\DownloadHandlerForm.designer.cs">
-      <DependentUpon>DownloadHandlerForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="DownloadHandler\UIControls\SegmentedProgressBar.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -115,12 +103,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="DownloaderControl.resx">
       <DependentUpon>DownloaderControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DownloadHandler\Download Completed Form.resx">
-      <DependentUpon>Download Completed Form.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DownloadHandler\DownloadHandlerForm.resx">
-      <DependentUpon>DownloadHandlerForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EnterUrlForm.resx">
       <DependentUpon>EnterUrlForm.cs</DependentUpon>
