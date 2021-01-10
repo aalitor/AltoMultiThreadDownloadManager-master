@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Linq;
 using AltoMultiThreadDownloadManager;
+using System.ComponentModel;
 
 namespace DownloadManagerPortal.DownloadHandler.UIControls
 {
@@ -21,7 +22,15 @@ namespace DownloadManagerPortal.DownloadHandler.UIControls
             SetStyle(ControlStyles.DoubleBuffer, true);
             SetStyle(ControlStyles.UserPaint, true);
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+            this.SizeChanged += SegmentedProgressBar_SizeChanged;
         }
+
+        void SegmentedProgressBar_SizeChanged(object sender, EventArgs e)
+        {
+            Invalidate();
+        }
+        
+        
         public override Color BackColor
         {
             get
@@ -37,6 +46,7 @@ namespace DownloadManagerPortal.DownloadHandler.UIControls
         protected override void OnPaint(PaintEventArgs e)
         {
             var grp = e.Graphics;
+            step = Width * 1f / contentLength;
             foreach (var br in bars.Where(x=>x.Length > 0))
             {
                 var x = br.Start * step;

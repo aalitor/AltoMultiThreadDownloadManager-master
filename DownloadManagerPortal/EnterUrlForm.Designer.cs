@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.txtUrl = new System.Windows.Forms.TextBox();
-            this.btnStart = new System.Windows.Forms.Button();
+            this.btnStart = new AltoControls.AltoButton();
             this.SuspendLayout();
             // 
             // txtUrl
@@ -41,21 +41,33 @@
             // 
             // btnStart
             // 
+            this.btnStart.Active1 = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(168)))), ((int)(((byte)(183)))));
+            this.btnStart.Active2 = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(164)))), ((int)(((byte)(183)))));
+            this.btnStart.BackColor = System.Drawing.Color.Transparent;
+            this.btnStart.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.btnStart.Font = new System.Drawing.Font("Comic Sans MS", 10F, System.Drawing.FontStyle.Bold);
+            this.btnStart.ForeColor = System.Drawing.Color.Black;
+            this.btnStart.Inactive1 = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(188)))), ((int)(((byte)(210)))));
+            this.btnStart.Inactive2 = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(167)))), ((int)(((byte)(188)))));
             this.btnStart.Location = new System.Drawing.Point(421, 39);
             this.btnStart.Name = "btnStart";
-            this.btnStart.Size = new System.Drawing.Size(75, 23);
-            this.btnStart.TabIndex = 1;
+            this.btnStart.Radius = 10;
+            this.btnStart.Size = new System.Drawing.Size(75, 27);
+            this.btnStart.Stroke = false;
+            this.btnStart.StrokeColor = System.Drawing.Color.Gray;
+            this.btnStart.TabIndex = 2;
             this.btnStart.Text = "Start";
-            this.btnStart.UseVisualStyleBackColor = true;
+            this.btnStart.Transparency = false;
             this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
             // 
             // EnterUrlForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(508, 69);
+            this.ClientSize = new System.Drawing.Size(508, 76);
             this.Controls.Add(this.btnStart);
             this.Controls.Add(this.txtUrl);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "EnterUrlForm";
             this.Text = "EnterUrlForm";
             this.ResumeLayout(false);
@@ -66,6 +78,6 @@
         #endregion
 
         private System.Windows.Forms.TextBox txtUrl;
-        private System.Windows.Forms.Button btnStart;
+        private AltoControls.AltoButton btnStart;
     }
 }

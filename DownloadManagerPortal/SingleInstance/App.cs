@@ -71,8 +71,9 @@ namespace DownloadManagerPortal.SingleInstancing
         }
         public void SendMessage(DownloadMessage msg)
         {
-            // Attempt to create a tracker
-            tracker = new SingleInstanceTracker("SingleInstanceSample", new SingleInstanceEnforcerRetriever(GetSingleInstanceEnforcer));
+            if (tracker == null)
+                // Attempt to create a tracker
+                tracker = new SingleInstanceTracker("SingleInstanceSample", new SingleInstanceEnforcerRetriever(GetSingleInstanceEnforcer));
             if (msg != null)
             {
                 var json = JsonConvert.SerializeObject(msg);

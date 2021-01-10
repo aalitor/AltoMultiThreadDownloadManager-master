@@ -12,6 +12,7 @@ using AltoMultiThreadDownloadManager.NativeMessages;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using DownloadManagerPortal.SingleInstancing;
+using System.Drawing;
 namespace DownloadManagerPortal
 {
     public partial class DownloaderControl : UserControl
@@ -21,7 +22,10 @@ namespace DownloadManagerPortal
         bool directStart;
         string rootRangeDir;
         WaitingNewUrl waiterForm;
-
+        public DownloaderControl()
+        {
+            InitializeComponent();
+        }
         public DownloaderControl(MultiThreadDownloadOrganizer mtdo, bool directStart = true)
         {
             InitializeComponent();
@@ -33,6 +37,7 @@ namespace DownloadManagerPortal
             this.directStart = directStart;
             rootRangeDir = mtdo.RangeDir;
             lblStatus.Text = dorg.Status.ToString();
+            this.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         }
         void setMTDOComponents()
         {
@@ -336,7 +341,8 @@ namespace DownloadManagerPortal
                 lblBytesReceived.Text = string.Format("Bytes Received: {0} / {1}", dorg.TotalBytesReceived.ToHumanReadableSize(), dorg.Info.ContentSize.ToHumanReadableSize());
                 lblContentSize.Text = string.Format("Content Size: {0}", dorg.Info.ContentSize.ToHumanReadableSize());
                 lblServerFileName.Text = string.Format("Server Filename: {0}", dorg.Info.ServerFileName);
-                lblResumeability.Text = string.Format("Resumeability: {0}", dorg.Info.AcceptRanges ? "Yes" : "No");
+                lblResumeability.Text = string.Format("{0}", dorg.Info.AcceptRanges ? "Yes" : "No");
+                lblResumeability.ForeColor = lblResumeability.Text == "Yes" ? Color.Green : Color.Red;
             }
             catch
             {

@@ -101,8 +101,7 @@ namespace DownloadManagerPortal
                 var msg = e.Message.ToString();
                 var downloadRequest = JsonConvert.DeserializeObject<DownloadMessage>(msg);
 
-                var f = findDownloader(downloadRequest.FileName);
-
+                var f = findDownloader(downloadRequest.FileName, downloadRequest.Url);
                 var completed = checkDownloadCompleted(f);
 
                 if (f == null)
@@ -133,7 +132,12 @@ namespace DownloadManagerPortal
                 }
                 else if (!f.dorg.IsActive)
                 {
+                    MessageBox.Show("Download already exists, will be resumed from where it left", f.dorg.Info.ServerFileName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                     f.dorg.Resume();
+                }
+                else if (f.dorg.IsActive)
+                {
+                    MessageBox.Show("Download already running!", f.dorg.Info.ServerFileName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             });
         }
@@ -144,7 +148,7 @@ namespace DownloadManagerPortal
         #region Select or remove download in list
 
 
-        DownloaderControl findDownloader(string filename)
+        DownloaderControl findDownloaderFromFilename(string filename)
         {
             if (string.IsNullOrEmpty(filename))
                 return null;
@@ -154,8 +158,22 @@ namespace DownloadManagerPortal
             return t.Any() ? t.OrderByDescending(x => x.dorg.TotalBytesReceived)
                 .ThenByDescending(x => x.dorg.LastTry).First() : null;
         }
+        DownloaderControl findDownloaderFromUrl(string url)
+        {
+            if (string.IsNullOrEmpty(url))
+                return null;
+            var t = MTDOList.Where(x => x.dorg != null && x.dorg.Info != null &&
+                            x.dorg.Info.Url == url);
 
-
+            return t.Any() ? t.OrderByDescending(x => x.dorg.TotalBytesReceived)
+                .ThenByDescending(x => x.dorg.LastTry).First() : null;
+        }
+        DownloaderControl findDownloader(string filename, string url)
+        {
+            var u = findDownloaderFromUrl(url);
+            var f = findDownloaderFromFilename(filename);
+            return u != null ? u : f != null ? f : null;
+        }
         #endregion
 
         MultiThreadDownloadOrganizer createMTDO(DownloadMessage MSG)
@@ -185,5 +203,13 @@ namespace DownloadManagerPortal
         {
             throw new NotImplementedException();
         }
+
+
+        private void btnAddDownload_Click(object sender, EventArgs e)
+        {
+            new EnterUrlForm().ShowDialog();
+        }
+
+
     }
 }
