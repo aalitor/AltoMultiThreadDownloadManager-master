@@ -55,10 +55,6 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="XPTable, Version=1.6.1.140, Culture=neutral, PublicKeyToken=24950705800d2198, processorArchitecture=MSIL">
-      <HintPath>..\packages\XPTable.1.6.1.140\lib\net20\XPTable.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChromeIntegrator\NativeMessageHost.cs" />
