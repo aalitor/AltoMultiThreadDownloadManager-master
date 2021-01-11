@@ -6,7 +6,7 @@ using System.Linq;
 using AltoMultiThreadDownloadManager;
 using System.ComponentModel;
 
-namespace DownloadManagerPortal.DownloadHandler.UIControls
+namespace DownloadManagerPortal.Downloader.UIControls
 {
     /// <summary>
     /// Description of SegmentedProgressBar.

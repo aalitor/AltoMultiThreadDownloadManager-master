@@ -7,7 +7,7 @@ using DownloadManagerPortal;
 using AltoMultiThreadDownloadManager.NativeMessages;
 using AltoMultiThreadDownloadManager;
 using Newtonsoft.Json;
-using DownloadManagerPortal.DownloadHandler;
+using DownloadManagerPortal.Downloader;
 
 
 

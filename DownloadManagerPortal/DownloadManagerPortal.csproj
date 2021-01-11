@@ -45,6 +45,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Design" />
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -54,6 +55,10 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="XPTable, Version=1.6.1.140, Culture=neutral, PublicKeyToken=24950705800d2198, processorArchitecture=MSIL">
+      <HintPath>..\packages\XPTable.1.6.1.140\lib\net20\XPTable.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChromeIntegrator\NativeMessageHost.cs" />
@@ -64,14 +69,23 @@
     <Compile Include="DownloadCenterForm.Designer.cs">
       <DependentUpon>DownloadCenterForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="DownloaderControl.cs">
-      <SubType>UserControl</SubType>
+    <Compile Include="DownloadCompletedForm.cs">
+      <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DownloaderControl.Designer.cs">
-      <DependentUpon>DownloaderControl.cs</DependentUpon>
+    <Compile Include="DownloadCompletedForm.Designer.cs">
+      <DependentUpon>DownloadCompletedForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="DownloadHandler\UIControls\Bar.cs" />
-    <Compile Include="DownloadHandler\UIControls\SegmentedProgressBar.cs">
+    <Compile Include="Downloader\DownloaderForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Downloader\DownloaderForm.Designer.cs">
+      <DependentUpon>DownloaderForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DownloaderFormListViewOperations.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Downloader\UIControls\Bar.cs" />
+    <Compile Include="Downloader\UIControls\SegmentedProgressBar.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ChromeIntegrator\HostExtensionIntegration.cs" />
@@ -92,6 +106,9 @@
     <Compile Include="SingleInstance\SingleInstanceException.cs" />
     <Compile Include="SingleInstance\SingleInstanceProxy.cs" />
     <Compile Include="SingleInstance\SingleInstanceTracker.cs" />
+    <Compile Include="TextedProgressBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="WaitingNewUrl.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -101,8 +118,11 @@
     <EmbeddedResource Include="DownloadCenterForm.resx">
       <DependentUpon>DownloadCenterForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="DownloaderControl.resx">
-      <DependentUpon>DownloaderControl.cs</DependentUpon>
+    <EmbeddedResource Include="DownloadCompletedForm.resx">
+      <DependentUpon>DownloadCompletedForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Downloader\DownloaderForm.resx">
+      <DependentUpon>DownloaderForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EnterUrlForm.resx">
       <DependentUpon>EnterUrlForm.cs</DependentUpon>
@@ -140,6 +160,7 @@
       <Name>AltoMultiThreadDownloadManager</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

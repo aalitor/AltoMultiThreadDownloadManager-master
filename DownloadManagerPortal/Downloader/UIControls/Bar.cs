@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using AltoMultiThreadDownloadManager;
 
-namespace DownloadManagerPortal.DownloadHandler.UIControls
+namespace DownloadManagerPortal.Downloader.UIControls
 {
     class Bar : INotifyPropertyChanged
     {

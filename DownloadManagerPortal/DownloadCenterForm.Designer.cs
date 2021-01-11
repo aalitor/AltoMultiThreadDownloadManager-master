@@ -28,23 +28,21 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+            this.components = new System.ComponentModel.Container();
             this.btnAddDownload = new AltoControls.AltoButton();
+            this.listView1 = new System.Windows.Forms.ListView();
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.btnResume = new AltoControls.AltoButton();
+            this.btnDelete = new AltoControls.AltoButton();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
-            // 
-            // flowLayoutPanel1
-            // 
-            this.flowLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.flowLayoutPanel1.AutoScroll = true;
-            this.flowLayoutPanel1.AutoSize = true;
-            this.flowLayoutPanel1.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(13, 43);
-            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Padding = new System.Windows.Forms.Padding(0, 5, 0, 0);
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(754, 236);
-            this.flowLayoutPanel1.TabIndex = 0;
             // 
             // btnAddDownload
             // 
@@ -67,24 +65,146 @@
             this.btnAddDownload.Transparency = false;
             this.btnAddDownload.Click += new System.EventHandler(this.btnAddDownload_Click);
             // 
+            // listView1
+            // 
+            this.listView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2,
+            this.columnHeader7,
+            this.columnHeader3,
+            this.columnHeader8,
+            this.columnHeader4,
+            this.columnHeader5,
+            this.columnHeader6});
+            this.listView1.FullRowSelect = true;
+            this.listView1.GridLines = true;
+            this.listView1.Location = new System.Drawing.Point(13, 58);
+            this.listView1.MultiSelect = false;
+            this.listView1.Name = "listView1";
+            this.listView1.ShowItemToolTips = true;
+            this.listView1.Size = new System.Drawing.Size(750, 221);
+            this.listView1.TabIndex = 13;
+            this.listView1.UseCompatibleStateImageBehavior = false;
+            this.listView1.View = System.Windows.Forms.View.Details;
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "Name";
+            this.columnHeader1.Width = 155;
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "Progress";
+            // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "ContentSize";
+            this.columnHeader3.Width = 110;
+            // 
+            // columnHeader4
+            // 
+            this.columnHeader4.Text = "Speed";
+            this.columnHeader4.Width = 103;
+            // 
+            // columnHeader5
+            // 
+            this.columnHeader5.Text = "Resumeability";
+            this.columnHeader5.Width = 146;
+            // 
+            // btnResume
+            // 
+            this.btnResume.Active1 = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(168)))), ((int)(((byte)(183)))));
+            this.btnResume.Active2 = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(164)))), ((int)(((byte)(183)))));
+            this.btnResume.BackColor = System.Drawing.Color.Transparent;
+            this.btnResume.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.btnResume.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.btnResume.ForeColor = System.Drawing.Color.Black;
+            this.btnResume.Inactive1 = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(188)))), ((int)(((byte)(210)))));
+            this.btnResume.Inactive2 = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(167)))), ((int)(((byte)(188)))));
+            this.btnResume.Location = new System.Drawing.Point(117, 12);
+            this.btnResume.Name = "btnResume";
+            this.btnResume.Radius = 10;
+            this.btnResume.Size = new System.Drawing.Size(98, 25);
+            this.btnResume.Stroke = false;
+            this.btnResume.StrokeColor = System.Drawing.Color.Gray;
+            this.btnResume.TabIndex = 12;
+            this.btnResume.Text = "Resume";
+            this.btnResume.Transparency = false;
+            this.btnResume.Click += new System.EventHandler(this.btnResume_Click);
+            // 
+            // btnDelete
+            // 
+            this.btnDelete.Active1 = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(168)))), ((int)(((byte)(183)))));
+            this.btnDelete.Active2 = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(164)))), ((int)(((byte)(183)))));
+            this.btnDelete.BackColor = System.Drawing.Color.Transparent;
+            this.btnDelete.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.btnDelete.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.btnDelete.ForeColor = System.Drawing.Color.Black;
+            this.btnDelete.Inactive1 = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(188)))), ((int)(((byte)(210)))));
+            this.btnDelete.Inactive2 = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(167)))), ((int)(((byte)(188)))));
+            this.btnDelete.Location = new System.Drawing.Point(221, 12);
+            this.btnDelete.Name = "btnDelete";
+            this.btnDelete.Radius = 10;
+            this.btnDelete.Size = new System.Drawing.Size(98, 25);
+            this.btnDelete.Stroke = false;
+            this.btnDelete.StrokeColor = System.Drawing.Color.Gray;
+            this.btnDelete.TabIndex = 12;
+            this.btnDelete.Text = "Delete";
+            this.btnDelete.Transparency = false;
+            this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
+            // 
+            // timer1
+            // 
+            this.timer1.Enabled = true;
+            this.timer1.Interval = 1;
+            // 
+            // columnHeader6
+            // 
+            this.columnHeader6.Text = "Url";
+            this.columnHeader6.Width = 156;
+            // 
+            // columnHeader7
+            // 
+            this.columnHeader7.Text = "Total Bytes Received";
+            // 
+            // columnHeader8
+            // 
+            this.columnHeader8.Text = "Status";
+            // 
             // DownloadCenterForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(775, 291);
+            this.Controls.Add(this.listView1);
+            this.Controls.Add(this.btnDelete);
+            this.Controls.Add(this.btnResume);
             this.Controls.Add(this.btnAddDownload);
-            this.Controls.Add(this.flowLayoutPanel1);
             this.MinimumSize = new System.Drawing.Size(791, 330);
             this.Name = "DownloadCenterForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Download Center";
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
         private AltoControls.AltoButton btnAddDownload;
+        private System.Windows.Forms.ListView listView1;
+        private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.ColumnHeader columnHeader3;
+        private System.Windows.Forms.ColumnHeader columnHeader4;
+        private System.Windows.Forms.ColumnHeader columnHeader5;
+        private AltoControls.AltoButton btnResume;
+        private AltoControls.AltoButton btnDelete;
+        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.ColumnHeader columnHeader6;
+        private System.Windows.Forms.ColumnHeader columnHeader7;
+        private System.Windows.Forms.ColumnHeader columnHeader8;
     }
 }

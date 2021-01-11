@@ -1,43 +1,56 @@
-﻿using System;
-using System.Linq;
-using System.Windows.Forms;
-using AltoMultiThreadDownloadManager;
-using System.IO;
-using AltoMultiThreadDownloadManager.Helpers;
-using DownloadManagerPortal.DownloadHandler.UIControls;
-using System.Diagnostics;
+﻿using AltoMultiThreadDownloadManager;
 using AltoMultiThreadDownloadManager.Exceptions;
-using System.Net;
 using AltoMultiThreadDownloadManager.NativeMessages;
-using Newtonsoft.Json;
-using System.Collections.Generic;
+using DownloadManagerPortal.Downloader.UIControls;
 using DownloadManagerPortal.SingleInstancing;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
-namespace DownloadManagerPortal
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Windows.Forms;
+using AltoMultiThreadDownloadManager.Helpers;
+namespace DownloadManagerPortal.Downloader
 {
-    public partial class DownloaderControl : UserControl
+    public partial class DownloaderForm : Form
     {
+        public DownloaderForm()
+        {
+            InitializeComponent();
+
+        }
+
         public MultiThreadDownloadOrganizer dorg { get; set; }
         public bool NewUrlRequested { get; set; }
         bool directStart;
         string rootRangeDir;
         WaitingNewUrl waiterForm;
-        public DownloaderControl()
+
+        public DownloaderForm(MultiThreadDownloadOrganizer mtdo, bool directStart = true)
         {
             InitializeComponent();
-        }
-        public DownloaderControl(MultiThreadDownloadOrganizer mtdo, bool directStart = true)
-        {
-            InitializeComponent();
+            this.FormClosing += DownloaderForm_FormClosing;
             this.dorg = mtdo;
             setMTDOComponents();
-            btnDelete.Click += btnDelete_Click;
             btnPauseResume.Click += btnPauseOrResume_Click;
             this.Load += DownloaderControl_Load;
             this.directStart = directStart;
             rootRangeDir = mtdo.RangeDir;
             lblStatus.Text = dorg.Status.ToString();
             this.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            this.Shown += DownloaderForm_Shown;
+        }
+        bool flagCloseAfterStop = false;
+        void DownloaderForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (dorg != null && dorg.IsActive)
+            {
+                flagCloseAfterStop = true;
+                dorg.Stop();
+            }
         }
         void setMTDOComponents()
         {
@@ -67,6 +80,8 @@ namespace DownloadManagerPortal
             }
             else
             {
+                if (list == null)
+                    list = new List<MultiThreadDownloadOrganizer>();
                 list.Add(dorg);
             }
 
@@ -75,52 +90,60 @@ namespace DownloadManagerPortal
             Properties.Settings.Default.DownloadList = json;
             Properties.Settings.Default.Save();
         }
+        void setButtonStatus(DownloaderStatus status)
+        {
+            lblStatus.Text = status.ToString();
+            saveMTDO();
+            switch (status)
+            {
+                case DownloaderStatus.Completed:
+                    btnPauseResume.Text = "Download again";
+                    btnPauseResume.Enabled = true;
+                    this.ControlBox = true;
+                    this.Enabled = true;
+                    break;
+                case DownloaderStatus.Downloading:
+                    btnPauseResume.Text = "Pause";
+                    btnPauseResume.Enabled = true;
+                    this.ControlBox = true;
+                    this.Enabled = true;
+                    break;
+                case DownloaderStatus.MergingFiles:
+                    btnPauseResume.Enabled = false;
+                    this.ControlBox = false;
+                    this.Enabled = false;
+                    break;
+                case DownloaderStatus.Stopped:
+                    btnPauseResume.Text = "Resume";
+                    btnPauseResume.Enabled = true;
+                    this.ControlBox = true;
+                    this.Enabled = true;
+                    break;
+            }
+        }
         void dorg_StatusChanged(object sender, AltoMultiThreadDownloadManager.EventArguments.StatusChangedEventArgs e)
         {
-            this.Invoke((MethodInvoker)delegate
+            if (InvokeRequired)
             {
-                lblStatus.Text = e.CurrentStatus.ToString();
-                saveMTDO();
-                switch (e.CurrentStatus)
+                this.Invoke((MethodInvoker)delegate
                 {
-                    case DownloaderStatus.Completed:
-                        btnPauseResume.Text = "Download again";
-                        btnPauseResume.Enabled = true;
-                        btnDelete.Enabled = true;
-                        btnOpenFile.Enabled = true;
-                        App.Instance.MainForm.ControlBox = true;
-                        break;
-                    case DownloaderStatus.Downloading:
-                        btnPauseResume.Text = "Pause";
-                        btnPauseResume.Enabled = true;
-                        btnDelete.Enabled = false;
-                        btnOpenFile.Enabled = false;
-                        App.Instance.MainForm.ControlBox = true;
-                        break;
-                    case DownloaderStatus.MergingFiles:
-                        btnPauseResume.Enabled = false;
-                        btnDelete.Enabled = false;
-                        btnOpenFile.Enabled = false;
-                        App.Instance.MainForm.ControlBox = false;
-                        break;
-                    case DownloaderStatus.Stopped:
-                        btnPauseResume.Text = "Resume";
-                        btnPauseResume.Enabled = true;
-                        btnDelete.Enabled = true;
-                        App.Instance.MainForm.ControlBox = true;
-                        break;
-                }
-            });
+                    setButtonStatus(e.CurrentStatus);
+                });
+            }
+            else
+            {
+                setButtonStatus(e.CurrentStatus);
+            }
+
+
         }
         void DownloaderControl_Load(object sender, EventArgs e)
         {
             DoubleBuffering.SetDoubleBuffered(this);
             if (!directStart)
             {
-                btnDelete.Enabled = true;
-                btnPauseResume.Text = dorg.Progress == 100 ? "Download again" : "Resume";
+                btnPauseResume.Text = dorg.Status == DownloaderStatus.Completed ? "Download again" : "Resume";
                 btnPauseResume.Enabled = true;
-                btnOpenFile.Enabled = dorg.Progress == 100;
             }
             else
             {
@@ -190,6 +213,8 @@ namespace DownloadManagerPortal
         }
         public void DownloadAgain()
         {
+            if (!this.Visible)
+                this.Show(null);
             dorg = new MultiThreadDownloadOrganizer(dorg.Url, Path.GetDirectoryName(dorg.FilePath), dorg.RangeDir, dorg.NofThread)
             {
                 DownloadRequestMessage = dorg.DownloadRequestMessage,
@@ -199,12 +224,15 @@ namespace DownloadManagerPortal
         }
         public void RefreshUrl(DownloadMessage msg)
         {
+            if (!this.Visible)
+                this.Show(null);
             this.Invoke((MethodInvoker)delegate
             {
                 NewUrlRequested = false;
                 waiterForm.Close();
                 dorg.Url = msg.Url;
                 dorg.Info.Url = msg.Url;
+                this.Shown+=DownloaderForm_Shown;
                 dorg.DownloadRequestMessage = msg;
                 if (dorg.Status == DownloaderStatus.Completed)
                 {
@@ -259,59 +287,98 @@ namespace DownloadManagerPortal
         }
         void requestNewUrl()
         {
+
             NewUrlRequested = true;
             waiterForm = new WaitingNewUrl();
             waiterForm.FormClosed += (m, n) => NewUrlRequested = true;
             waiterForm.Shown += (m, n) => waiterForm.Activate();
+            this.Shown += DownloaderForm_Shown;
             Process.Start(dorg.DownloadRequestMessage.TabUrl);
             waiterForm.TopMost = true;
+            this.Hide();
             waiterForm.ShowDialog();
+        }
+
+        void DownloaderForm_Shown(object sender, EventArgs e)
+        {
+            if (waiterForm != null && waiterForm.Visible)
+            {
+                waiterForm.Close();
+            }
         }
 
         private void dorg_MergingProgressChanged(object sender, AltoMultiThreadDownloadManager.EventArguments.MergingProgressChangedEventArgs e)
         {
             timer1.Enabled = false;
             progressBar1.Value = (int)e.Progress;
+
         }
 
         private void dorg_ProgressChanged(object sender, AltoMultiThreadDownloadManager.EventArguments.ProgressChangedEventArgs e)
         {
-
+            segmentedProgressBar1.ContentLength = dorg.Info.ContentSize;
+            segmentedProgressBar1.Bars =
+                dorg.Ranges.ToList().Select(x => new Bar(x.TotalBytesReceived, x.Start, x.Status)).ToArray();
+            progressBar1.Value = (int)(dorg.Progress * 100);
+            lblSpeed.Text = string.Format("Speed: {0}", dorg.Speed.ToHumanReadableSize() + "/s");
+            lblProgress.Text = "Progress: " + dorg.ProgressString;
+            lblBytesReceived.Text = string.Format("Bytes Received: {0} / {1}", dorg.TotalBytesReceived.ToHumanReadableSize(), dorg.Info.ContentSize.ToHumanReadableSize());
+            lblContentSize.Text = string.Format("Content Size: {0}", dorg.Info.ContentSize.ToHumanReadableSize());
+            lblServerFileName.Text = string.Format("Server Filename: {0}", dorg.Info.ServerFileName);
+            lblResumeability.Text = string.Format("{0}", dorg.Info.AcceptRanges ? "Yes" : "No");
+            lblResumeability.ForeColor = lblResumeability.Text == "Yes" ? Color.Green : Color.Red;
+            this.Text = dorg.Info.ServerFileName;
+            txtUrl.Text = dorg.Url;
         }
 
         private void dorg_Completed(object sender, EventArgs e)
         {
-            btnOpenFile.Enabled = true;
             btnPauseResume.Text = "Download again";
             if (Directory.Exists(dorg.RangeDir))
                 Directory.Delete(dorg.RangeDir, true);
             updateUI();
+            this.FormClosed += DownloaderForm_FormClosed;
+            this.Close();
+        }
+
+        void DownloaderForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (dorg != null && dorg.Status == DownloaderStatus.Completed)
+            {
+                new DownloadCompletedForm(dorg).Show(null);
+            }
         }
 
         private void dorg_DownloadInfoReceived(object sender, EventArgs e)
         {
-            this.Invoke((MethodInvoker)delegate
+            try
             {
-                var info = dorg.Info;
-                dorg.LastInfo = info.Clone();
-                //Set the filename after we have ServerFileName determined
-                dorg.FilePath = Path.Combine(dorg.FilePath, info.ServerFileName);
-                dorg.RangeDir = Path.Combine(rootRangeDir, info.ServerFileName);
-                Directory.CreateDirectory(dorg.RangeDir);
-                foreach (var item in dorg.Ranges)
+                this.Invoke((MethodInvoker)delegate
                 {
-                    item.SaveDir = dorg.RangeDir;
-                }
-                //Set progress bar totallength
-                segmentedProgressBar1.ContentLength = info.ContentSize;
+                    var info = dorg.Info;
+                    //Set the filename after we have ServerFileName determined
+                    dorg.FilePath = Path.Combine(dorg.FilePath, info.ServerFileName);
+                    dorg.RangeDir = Path.Combine(rootRangeDir, info.ServerFileName);
+                    Directory.CreateDirectory(dorg.RangeDir);
+                    foreach (var item in dorg.Ranges)
+                    {
+                        item.SaveDir = dorg.RangeDir;
+                    }
+                    //Set progress bar totallength
+                    segmentedProgressBar1.ContentLength = info.ContentSize;
 
-                timer1.Start();
-                btnPauseResume.Text = "Pause";
-                btnPauseResume.Enabled = info.AcceptRanges;
-                lblContentSize.Text = string.Format(lblContentSize.Text, info.ContentSize.ToHumanReadableSize());
-                lblServerFileName.Text = string.Format(lblServerFileName.Text, info.ServerFileName);
-                lblResumeability.Text = string.Format(lblResumeability.Text, info.AcceptRanges);
-            });
+                    timer1.Start();
+                    btnPauseResume.Text = "Pause";
+                    btnPauseResume.Enabled = info.AcceptRanges;
+                    lblContentSize.Text = string.Format(lblContentSize.Text, info.ContentSize.ToHumanReadableSize());
+                    lblServerFileName.Text = string.Format(lblServerFileName.Text, info.ServerFileName);
+                    lblResumeability.Text = string.Format(lblResumeability.Text, info.AcceptRanges);
+                });
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
 
         private void dorg_Resumed(object sender, EventArgs e)
@@ -321,7 +388,14 @@ namespace DownloadManagerPortal
 
         private void dorg_Stopped(object sender, EventArgs e)
         {
+
             timer1.Stop();
+            if (flagCloseAfterStop)
+            {
+                flagCloseAfterStop = false;
+                saveMTDO();
+                this.Close();
+            }
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -333,18 +407,8 @@ namespace DownloadManagerPortal
         {
             try
             {
-                segmentedProgressBar1.ContentLength = dorg.Info.ContentSize;
-                segmentedProgressBar1.Bars =
-                    dorg.Ranges.ToList().Select(x => new Bar(x.TotalBytesReceived, x.Start, x.Status)).ToArray();
-                progressBar1.Value = (int)dorg.Progress;
-                lblSpeed.Text = string.Format("Speed: {0}", dorg.Speed.ToHumanReadableSize() + "/s");
-                lblBytesReceived.Text = string.Format("Bytes Received: {0} / {1}", dorg.TotalBytesReceived.ToHumanReadableSize(), dorg.Info.ContentSize.ToHumanReadableSize());
-                lblContentSize.Text = string.Format("Content Size: {0}", dorg.Info.ContentSize.ToHumanReadableSize());
-                lblServerFileName.Text = string.Format("Server Filename: {0}", dorg.Info.ServerFileName);
-                lblResumeability.Text = string.Format("{0}", dorg.Info.AcceptRanges ? "Yes" : "No");
-                lblResumeability.ForeColor = lblResumeability.Text == "Yes" ? Color.Green : Color.Red;
             }
-            catch
+            catch (Exception ex)
             {
 
             }
@@ -359,6 +423,11 @@ namespace DownloadManagerPortal
             {
 
             }
+        }
+
+        private void btnOpenFile_Click_1(object sender, EventArgs e)
+        {
+
         }
 
 

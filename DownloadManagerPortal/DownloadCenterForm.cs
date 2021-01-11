@@ -1,5 +1,6 @@
 ﻿using AltoMultiThreadDownloadManager;
 using AltoMultiThreadDownloadManager.NativeMessages;
+using DownloadManagerPortal.Downloader;
 using DownloadManagerPortal.SingleInstancing;
 using Newtonsoft.Json;
 using System;
@@ -12,18 +13,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using XPTable.Models;
 
 namespace DownloadManagerPortal
 {
     public partial class DownloadCenterForm : Form, ISingleInstanceEnforcer
     {
-        List<DownloaderControl> formlist = new List<DownloaderControl>();
+        List<DownloaderForm> formlist = new List<DownloaderForm>();
         public DownloadCenterForm()
         {
             InitializeComponent();
             this.Load += DownloadCenterForm_Load;
             this.FormClosing += DownloadCenterForm_FormClosing;
+            DoubleBuffering.SetDoubleBuffered(listView1);
+            timer1.Tick += timer1_Tick;
+            listView1.SelectedIndexChanged += listView1_SelectedIndexChanged;
         }
+
+        
+
+       
 
         void DownloadCenterForm_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -54,6 +63,11 @@ namespace DownloadManagerPortal
         void DownloadCenterForm_Load(object sender, EventArgs e)
         {
             readSettings();
+            AddRows();
+            foreach (var item in formlist)
+            {
+                WriteItem(item.dorg);
+            }
         }
 
 
@@ -77,8 +91,9 @@ namespace DownloadManagerPortal
                 if (list != null && list.Any())
                     foreach (var item in list)
                     {
-                        var f = new DownloaderControl(item, false);
-                        flowLayoutPanel1.Controls.Add(f);
+                        var a = new DownloaderForm(item, false);
+                        a.FormClosed += a_FormClosed;
+                        formlist.Add(a);
                     }
             }
             catch
@@ -87,12 +102,39 @@ namespace DownloadManagerPortal
             }
         }
         #endregion
-        bool checkDownloadCompleted(DownloaderControl f)
+        bool checkDownloadCompleted(DownloaderForm f)
         {
             return f != null && f.dorg != null && f.dorg.Info != null && f.dorg.Progress == 100;
         }
 
+        void showForm(DownloaderForm f, DownloadMessage req, bool directStart)
+        {
 
+            if (f != null && f.Visible)
+            {
+                return;
+            }
+            else
+            {
+
+                removeForm(req.FileName, req.Url);
+                var a = new DownloaderForm(f.dorg, directStart);
+                a.FormClosed += a_FormClosed;
+                formlist.Add(a);
+                a.Show(null);
+            }
+        }
+
+        void a_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            var a = (DownloaderForm)sender;
+            a.dorg.Stop();
+            removeForm(a.dorg.DownloadRequestMessage.FileName, a.dorg.DownloadRequestMessage.Url);
+            a = new DownloaderForm(a.dorg, false);
+            a.FormClosed += a_FormClosed;
+            formlist.Add(a);
+            this.Activate();
+        }
         public void OnMessageReceived(MessageEventArgs e)
         {
             this.Invoke((MethodInvoker)delegate
@@ -109,8 +151,8 @@ namespace DownloadManagerPortal
                     this.Invoke((MethodInvoker)delegate
                     {
                         var mtdo = createMTDO(downloadRequest);
-                        var downloader = new DownloaderControl(mtdo);
-                        flowLayoutPanel1.Controls.Add(downloader);
+                        var downloader = new DownloaderForm(mtdo, true);
+                        showForm(downloader, downloadRequest, true);
                         this.Activate();
                     });
                 }
@@ -132,12 +174,15 @@ namespace DownloadManagerPortal
                 }
                 else if (!f.dorg.IsActive)
                 {
-                    MessageBox.Show("Download already exists, will be resumed from where it left", f.dorg.Info.ServerFileName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                     f.dorg.Resume();
+                    if (!f.Visible)
+                        f.Show(null);
                 }
                 else if (f.dorg.IsActive)
                 {
                     MessageBox.Show("Download already running!", f.dorg.Info.ServerFileName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    if (!f.Visible)
+                        f.Show(null);
                 }
             });
         }
@@ -148,7 +193,7 @@ namespace DownloadManagerPortal
         #region Select or remove download in list
 
 
-        DownloaderControl findDownloaderFromFilename(string filename)
+        internal DownloaderForm findDownloaderFromFilename(string filename)
         {
             if (string.IsNullOrEmpty(filename))
                 return null;
@@ -158,7 +203,7 @@ namespace DownloadManagerPortal
             return t.Any() ? t.OrderByDescending(x => x.dorg.TotalBytesReceived)
                 .ThenByDescending(x => x.dorg.LastTry).First() : null;
         }
-        DownloaderControl findDownloaderFromUrl(string url)
+        internal DownloaderForm findDownloaderFromUrl(string url)
         {
             if (string.IsNullOrEmpty(url))
                 return null;
@@ -168,15 +213,21 @@ namespace DownloadManagerPortal
             return t.Any() ? t.OrderByDescending(x => x.dorg.TotalBytesReceived)
                 .ThenByDescending(x => x.dorg.LastTry).First() : null;
         }
-        DownloaderControl findDownloader(string filename, string url)
+        internal DownloaderForm findDownloader(string filename, string url)
         {
             var u = findDownloaderFromUrl(url);
             var f = findDownloaderFromFilename(filename);
             return u != null ? u : f != null ? f : null;
         }
+
+        internal void removeForm(string filename, string url)
+        {
+            formlist = formlist.Where(x => x != null && x.dorg.Info != null && x.dorg.Info.ServerFileName != filename).ToList();
+            formlist = formlist.Where(x => x != null && x.dorg.Info != null && x.dorg.Info.Url != url).ToList();
+        }
         #endregion
 
-        MultiThreadDownloadOrganizer createMTDO(DownloadMessage MSG)
+        internal MultiThreadDownloadOrganizer createMTDO(DownloadMessage MSG)
         {
             var finalFolder = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             var tempFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
@@ -187,13 +238,13 @@ namespace DownloadManagerPortal
             return dorg;
         }
 
-        IEnumerable<DownloaderControl> MTDOList
+        internal IEnumerable<DownloaderForm> MTDOList
         {
             get
             {
-                return this.flowLayoutPanel1.Controls.Cast<Control>()
-                    .Where(x => x is DownloaderControl)
-                    .Select(x => (DownloaderControl)x);
+                return this.formlist.Cast<Control>()
+                    .Where(x => x is DownloaderForm)
+                    .Select(x => (DownloaderForm)x);
 
             }
         }
@@ -208,6 +259,31 @@ namespace DownloadManagerPortal
         private void btnAddDownload_Click(object sender, EventArgs e)
         {
             new EnterUrlForm().ShowDialog();
+        }
+
+        private void btnResume_Click(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count < 1)
+                return;
+            var item = listView1.SelectedItems[0];
+            var f = findDownloader(item.Text, item.SubItems[7].Text);
+            var msg = JsonConvert.SerializeObject(f.dorg.DownloadRequestMessage);
+            OnMessageReceived(new MessageEventArgs(msg));
+        }
+
+        private void btnDelete_Click(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count < 1)
+                return;
+            if (MessageHelper.AskYes("Are you sure to delete the selected items?")) ;
+            foreach (var item in listView1.SelectedItems)
+            {
+                var lvi = (ListViewItem)item;
+                var f = findDownloader(lvi.Text, "");
+                removeForm(f.dorg.DownloadRequestMessage.FileName, f.dorg.DownloadRequestMessage.Url);
+                listView1.Items.Remove(lvi);
+            }
+            saveDownloadList();
         }
 
 
