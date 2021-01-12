@@ -151,6 +151,8 @@ namespace AltoMultiThreadDownloadManager
             {
                 if (request != null)
                     request.Abort();
+                if(Range.Status == State.Downloading)
+                    Range.Status = Status = State.Failed;
             }
 
         }

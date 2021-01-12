@@ -36,8 +36,9 @@
     <StartupObject>DownloadManagerPortal.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AltoControls">
-      <HintPath>..\..\..\AppData\Local\Temp\Rar$DRa3268.36179\lib\AltoControls.dll</HintPath>
+    <Reference Include="AltoControls, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AltoControls.1.0.1\lib\AltoControls.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
