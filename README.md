@@ -1,5 +1,5 @@
 # AltoMultiThreadDownloadManager-master
- Download accelerator library and demo
+ Download accelerator library and demo. You can make your own Download Accelerator like IDM, FlashGet etc. using this library.
 
 This library provides multithreading download over Http. Using multithreading download speed can be 8x much faster.
 
@@ -14,6 +14,10 @@ This library provides multithreading download over Http. Using multithreading do
 	<li>Native messaging methods are provided in library</li>
 	<li>Chrome extension is included to messaging and capturing downloads</li>
 </ul>
+
+<h2>What's next:</h2>
+FTP download will be supported when it is ready
+
 
 
 <h2>Demo Application using native messaging</h2>
