@@ -247,6 +247,7 @@ namespace DownloadManagerPortal.Downloader
             };
             setDownloaderEvents();
             dorg.Start();
+            this.Activate();
         }
         public void RefreshUrl(DownloadMessage msg)
         {
@@ -254,6 +255,7 @@ namespace DownloadManagerPortal.Downloader
                 this.Show(null);
             this.Invoke((MethodInvoker)delegate
             {
+                this.Activate();
                 dorg.Url = msg.Url;
                 dorg.Info.Url = msg.Url;
                 this.Shown += DownloaderForm_Shown;

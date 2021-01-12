@@ -6,15 +6,10 @@ using DownloadManagerPortal.SingleInstancing;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DownloadManagerPortal
@@ -123,8 +118,16 @@ namespace DownloadManagerPortal
                 var a = new DownloaderForm(f.dorg, directStart);
                 a.FormClosed += a_FormClosed;
                 formlist.Add(a);
+                a.Shown += a_Shown;
                 a.Show(null);
             }
+        }
+
+        void a_Shown(object sender, EventArgs e)
+        {
+            var f = (DownloaderForm)sender;
+            this.BringToFront();
+            f.BringToFront();
         }
 
         void a_FormClosed(object sender, FormClosedEventArgs e)
@@ -141,7 +144,6 @@ namespace DownloadManagerPortal
         {
             this.Invoke((MethodInvoker)delegate
             {
-                this.Activate();
                 var msg = e.Message.ToString();
                 var downloadRequest = JsonConvert.DeserializeObject<DownloadMessage>(msg);
 
@@ -155,7 +157,6 @@ namespace DownloadManagerPortal
                         var mtdo = createMTDO(downloadRequest);
                         var downloader = new DownloaderForm(mtdo, true);
                         showForm(downloader, downloadRequest, true);
-                        this.Activate();
                     });
                 }
                 else if (f.NewUrlRequested)
@@ -164,6 +165,7 @@ namespace DownloadManagerPortal
                 }
                 else if (completed)
                 {
+                    this.Activate();
                     var result = MessageBox.Show("Download already completed! Do you want to download again?",
                         downloadRequest.FileName, MessageBoxButtons.YesNo);
                     if (result == System.Windows.Forms.DialogResult.Yes)
@@ -176,14 +178,18 @@ namespace DownloadManagerPortal
                 }
                 else if (!f.dorg.IsActive)
                 {
+                    this.Activate();
                     f.dorg.Resume();
                     if (!f.Visible)
-                        f.Show(null);
+                        f.Show(new DownloadCenterForm());
+                    f.Activate();
                 }
                 else if (f.dorg.IsActive)
                 {
+                    this.Activate();
                     if (!f.Visible)
-                        f.Show(null);
+                        f.Show(new DownloadCenterForm());
+                    f.Activate();
                 }
             });
         }
@@ -254,7 +260,6 @@ namespace DownloadManagerPortal
 
         public void OnNewInstanceCreated(EventArgs e)
         {
-            throw new NotImplementedException();
         }
 
 
