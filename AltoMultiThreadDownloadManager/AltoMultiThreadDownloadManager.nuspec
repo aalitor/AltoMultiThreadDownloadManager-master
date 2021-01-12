@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>AltoMultiThreadDownloadManager</id>
+    <version>1.1.0</version>
+    <title>AltoMultiThreadDownloadManager</title>
+    <authors>aalitor</authors>
+    <owners>aalitor</owners>
+    <licenseUrl>https://github.com/aalitor/AltoMultiThreadDownloadManager-master/blob/main/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/aalitor/AltoMultiThreadDownloadManager-master</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>AltoMultiThreadDownloadManager provides fast and easy management multithreading download</description>
+    <releaseNotes>New features added</releaseNotes>
+    <copyright>Copyright 2021</copyright>
+    <tags>alto http download multi thread manage content size fast easy pause speed resume progress header percentage idm internet download manager flash get stop</tags>
+  </metadata>
+</package>

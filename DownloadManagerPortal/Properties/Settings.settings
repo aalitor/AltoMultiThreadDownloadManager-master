@@ -11,5 +11,8 @@
     <Setting Name="ChromeExtensionId" Type="System.String" Scope="User">
       <Value Profile="(Default)">lmmjhgihkikoiieafpbmgacfhcappehb</Value>
     </Setting>
+    <Setting Name="ExtensionUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://chrome.google.com/webstore/devconsole/27b767b9-45e3-4717-aceb-e93739315a6a/kimajdeajmdbbldmjdckapkabikgkkee/edit?hl=tr</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

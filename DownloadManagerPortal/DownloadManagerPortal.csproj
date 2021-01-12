@@ -102,9 +102,6 @@
     <Compile Include="SingleInstance\SingleInstanceException.cs" />
     <Compile Include="SingleInstance\SingleInstanceProxy.cs" />
     <Compile Include="SingleInstance\SingleInstanceTracker.cs" />
-    <Compile Include="TextedProgressBar.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="WaitingNewUrl.cs">
       <SubType>Form</SubType>
     </Compile>

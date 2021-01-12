@@ -33,15 +33,16 @@
             this.listView1 = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.btnResume = new AltoControls.AltoButton();
             this.btnDelete = new AltoControls.AltoButton();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.btnIntegrateChrome = new AltoControls.AltoButton();
             this.SuspendLayout();
             // 
             // btnAddDownload
@@ -99,10 +100,18 @@
             // 
             this.columnHeader2.Text = "Progress";
             // 
+            // columnHeader7
+            // 
+            this.columnHeader7.Text = "Total Bytes Received";
+            // 
             // columnHeader3
             // 
             this.columnHeader3.Text = "ContentSize";
             this.columnHeader3.Width = 110;
+            // 
+            // columnHeader8
+            // 
+            this.columnHeader8.Text = "Status";
             // 
             // columnHeader4
             // 
@@ -113,6 +122,11 @@
             // 
             this.columnHeader5.Text = "Resumeability";
             this.columnHeader5.Width = 146;
+            // 
+            // columnHeader6
+            // 
+            this.columnHeader6.Text = "Url";
+            this.columnHeader6.Width = 156;
             // 
             // btnResume
             // 
@@ -161,18 +175,26 @@
             this.timer1.Enabled = true;
             this.timer1.Interval = 1;
             // 
-            // columnHeader6
+            // btnIntegrateChrome
             // 
-            this.columnHeader6.Text = "Url";
-            this.columnHeader6.Width = 156;
-            // 
-            // columnHeader7
-            // 
-            this.columnHeader7.Text = "Total Bytes Received";
-            // 
-            // columnHeader8
-            // 
-            this.columnHeader8.Text = "Status";
+            this.btnIntegrateChrome.Active1 = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.btnIntegrateChrome.Active2 = System.Drawing.Color.Lime;
+            this.btnIntegrateChrome.BackColor = System.Drawing.Color.Transparent;
+            this.btnIntegrateChrome.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.btnIntegrateChrome.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.btnIntegrateChrome.ForeColor = System.Drawing.Color.Black;
+            this.btnIntegrateChrome.Inactive1 = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.btnIntegrateChrome.Inactive2 = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.btnIntegrateChrome.Location = new System.Drawing.Point(648, 12);
+            this.btnIntegrateChrome.Name = "btnIntegrateChrome";
+            this.btnIntegrateChrome.Radius = 10;
+            this.btnIntegrateChrome.Size = new System.Drawing.Size(115, 25);
+            this.btnIntegrateChrome.Stroke = false;
+            this.btnIntegrateChrome.StrokeColor = System.Drawing.Color.Gray;
+            this.btnIntegrateChrome.TabIndex = 12;
+            this.btnIntegrateChrome.Text = "Integrate Chrome";
+            this.btnIntegrateChrome.Transparency = false;
+            this.btnIntegrateChrome.Click += new System.EventHandler(this.btnIntegrateChrome_Click);
             // 
             // DownloadCenterForm
             // 
@@ -180,6 +202,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(775, 291);
             this.Controls.Add(this.listView1);
+            this.Controls.Add(this.btnIntegrateChrome);
             this.Controls.Add(this.btnDelete);
             this.Controls.Add(this.btnResume);
             this.Controls.Add(this.btnAddDownload);
@@ -206,5 +229,6 @@
         private System.Windows.Forms.ColumnHeader columnHeader6;
         private System.Windows.Forms.ColumnHeader columnHeader7;
         private System.Windows.Forms.ColumnHeader columnHeader8;
+        private AltoControls.AltoButton btnIntegrateChrome;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using AltoMultiThreadDownloadManager;
 using AltoMultiThreadDownloadManager.NativeMessages;
+using DownloadManagerPortal.ChromeIntegrator;
 using DownloadManagerPortal.Downloader;
 using DownloadManagerPortal.SingleInstancing;
 using Newtonsoft.Json;
@@ -10,6 +11,8 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -29,9 +32,9 @@ namespace DownloadManagerPortal
             listView1.SelectedIndexChanged += listView1_SelectedIndexChanged;
         }
 
-        
 
-       
+
+
 
         void DownloadCenterForm_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -290,6 +293,43 @@ namespace DownloadManagerPortal
             saveDownloadList();
         }
 
+        private void btnIntegrateChrome_Click(object sender, EventArgs e)
+        {
+            if (!isAdmin())
+            {
+                MessageBox.Show("You must start the program as admin to integrate. Because registry operations are necessary for integration.", "Integration failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            var extname = Properties.Settings.Default.ChromeExtensionName;
+            var extid = Properties.Settings.Default.ChromeExtensionId;
+            var extensionUrl = Properties.Settings.Default.ExtensionUrl;
+
+            var currentDir = Directory.GetCurrentDirectory();
+            var hostPath = Path.Combine(currentDir, extname + ".json");
+            var exePath = Assembly.GetExecutingAssembly().Location;
+
+            var h = new HostExtensionIntegrator();
+            h.ExePath = exePath;
+            h.HostPath = hostPath;
+            h.CreateHostFile();
+
+            RegistryExtensionIntegrator.Complete(hostPath, extname);
+
+            MessageBox.Show("You must install the chrome extension in browser to complete integration if it is not installed",
+                "Integration almost ready", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+        }
+
+        bool isAdmin()
+        {
+            bool isElevated;
+            using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
+            {
+                WindowsPrincipal principal = new WindowsPrincipal(identity);
+                isElevated = principal.IsInRole(WindowsBuiltInRole.Administrator);
+            }
+            return isElevated;
+        }
 
     }
 }

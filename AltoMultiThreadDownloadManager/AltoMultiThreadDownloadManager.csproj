@@ -78,7 +78,6 @@
     <Compile Include="Helpers\FileNameHelper.cs" />
     <Compile Include="Helpers\RequestHelper.cs" />
     <Compile Include="Helpers\SizeHelper.cs" />
-    <Compile Include="Logger.cs" />
     <Compile Include="MultiThreadDownloadOrganizer.cs" />
     <Compile Include="NativeMessages\DownloadMessage.cs" />
     <Compile Include="NativeMessages\Header.cs" />

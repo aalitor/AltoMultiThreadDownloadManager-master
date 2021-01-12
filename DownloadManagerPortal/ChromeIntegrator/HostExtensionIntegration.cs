@@ -37,12 +37,12 @@ namespace DownloadManagerPortal.ChromeIntegrator
         {
             return JsonConvert.SerializeObject(GetHost(), Formatting.Indented);
         }
-        public void CheckHostFile(string path)
+        public void CreateHostFile()
         {
-            if (File.Exists(path))
-                File.Delete(path);
+            if (File.Exists(HostPath))
+                File.Delete(HostPath);
 
-            File.WriteAllText(path, GetHostJsonString());
+            File.WriteAllText(HostPath, GetHostJsonString());
         }
     }
 

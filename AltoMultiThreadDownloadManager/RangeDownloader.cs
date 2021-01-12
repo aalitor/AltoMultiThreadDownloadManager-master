@@ -68,7 +68,6 @@ namespace AltoMultiThreadDownloadManager
                     Range.Status = Status = State.GetResponseStream;
 
                     ResponseReceived.Raise(this, new ResponseReceivedEventArgs(response));
-                    Logger.Write("Range path: " + Range.FilePath);
                     using (fileStream = FileHelper.CheckFile(Range.FilePath, Range.TotalBytesReceived > 0))
                     {
                         using (var str = response.GetResponseStream())

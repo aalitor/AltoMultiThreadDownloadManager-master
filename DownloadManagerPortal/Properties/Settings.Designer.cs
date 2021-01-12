@@ -58,5 +58,18 @@ namespace DownloadManagerPortal.Properties {
                 this["ChromeExtensionId"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://chrome.google.com/webstore/devconsole/27b767b9-45e3-4717-aceb-e93739315a6" +
+            "a/kimajdeajmdbbldmjdckapkabikgkkee/edit?hl=tr")]
+        public string ExtensionUrl {
+            get {
+                return ((string)(this["ExtensionUrl"]));
+            }
+            set {
+                this["ExtensionUrl"] = value;
+            }
+        }
     }
 }
