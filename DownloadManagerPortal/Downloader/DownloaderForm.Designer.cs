@@ -28,9 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.lblResumeability = new System.Windows.Forms.Label();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.btnPauseResume = new AltoControls.AltoButton();
             this.lblBytesReceived = new System.Windows.Forms.Label();
             this.lblSpeed = new System.Windows.Forms.Label();
@@ -55,10 +53,6 @@
             this.lblResumeability.Size = new System.Drawing.Size(21, 13);
             this.lblResumeability.TabIndex = 16;
             this.lblResumeability.Text = "No";
-            // 
-            // timer1
-            // 
-            this.timer1.Interval = 10;
             // 
             // btnPauseResume
             // 
@@ -221,7 +215,6 @@
         #endregion
 
         private System.Windows.Forms.Label lblResumeability;
-        private System.Windows.Forms.Timer timer1;
         private AltoControls.AltoButton btnPauseResume;
         private System.Windows.Forms.Label lblBytesReceived;
         private System.Windows.Forms.Label lblSpeed;

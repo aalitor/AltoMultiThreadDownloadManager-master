@@ -457,6 +457,7 @@ namespace AltoMultiThreadDownloadManager
         /// Unique downloader id
         /// </summary>
         public string Id { get; set; }
+
         /// <summary>
         /// Gets or sets the number of max async threads
         /// </summary>

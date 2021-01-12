@@ -173,15 +173,12 @@ namespace DownloadManagerPortal
                 }
                 else if (!f.dorg.IsActive)
                 {
-                    MessageBox.Show("Download already exists but stopped, it will be resumed",
-                        downloadRequest.FileName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                     f.dorg.Resume();
                     if (!f.Visible)
                         f.Show(null);
                 }
                 else if (f.dorg.IsActive)
                 {
-                    MessageBox.Show("Download already running!", f.dorg.Info.ServerFileName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                     if (!f.Visible)
                         f.Show(null);
                 }
@@ -235,6 +232,7 @@ namespace DownloadManagerPortal
             tempFolder = Path.Combine(tempFolder, "AltoDownloadAccelerator");
             var nofThreads = 8;
             var dorg = new MultiThreadDownloadOrganizer(MSG.Url, finalFolder, "", tempFolder, nofThreads);
+            dorg.Id = Guid.NewGuid().ToString("N");
             dorg.DownloadRequestMessage = MSG;
             return dorg;
         }
