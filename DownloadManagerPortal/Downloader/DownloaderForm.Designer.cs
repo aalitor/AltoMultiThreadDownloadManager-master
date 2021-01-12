@@ -41,6 +41,7 @@
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.lblProgress = new System.Windows.Forms.Label();
             this.txtUrl = new System.Windows.Forms.TextBox();
+            this.lblError = new System.Windows.Forms.Label();
             this.segmentedProgressBar1 = new DownloadManagerPortal.Downloader.UIControls.SegmentedProgressBar();
             this.SuspendLayout();
             // 
@@ -71,7 +72,7 @@
             this.btnPauseResume.ForeColor = System.Drawing.Color.Black;
             this.btnPauseResume.Inactive1 = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(188)))), ((int)(((byte)(210)))));
             this.btnPauseResume.Inactive2 = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(167)))), ((int)(((byte)(188)))));
-            this.btnPauseResume.Location = new System.Drawing.Point(292, 178);
+            this.btnPauseResume.Location = new System.Drawing.Point(292, 212);
             this.btnPauseResume.Name = "btnPauseResume";
             this.btnPauseResume.Radius = 10;
             this.btnPauseResume.Size = new System.Drawing.Size(86, 25);
@@ -145,7 +146,7 @@
             // 
             this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBar1.Location = new System.Drawing.Point(8, 134);
+            this.progressBar1.Location = new System.Drawing.Point(8, 168);
             this.progressBar1.Maximum = 10000;
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(370, 20);
@@ -163,11 +164,21 @@
             // 
             // txtUrl
             // 
-            this.txtUrl.Enabled = false;
             this.txtUrl.Location = new System.Drawing.Point(8, 13);
             this.txtUrl.Name = "txtUrl";
+            this.txtUrl.ReadOnly = true;
             this.txtUrl.Size = new System.Drawing.Size(370, 20);
             this.txtUrl.TabIndex = 25;
+            // 
+            // lblError
+            // 
+            this.lblError.AutoSize = true;
+            this.lblError.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.lblError.Location = new System.Drawing.Point(5, 139);
+            this.lblError.Name = "lblError";
+            this.lblError.Size = new System.Drawing.Size(55, 13);
+            this.lblError.TabIndex = 14;
+            this.lblError.Text = "Last Error:";
             // 
             // segmentedProgressBar1
             // 
@@ -176,7 +187,7 @@
             this.segmentedProgressBar1.BackColor = System.Drawing.SystemColors.ControlLight;
             this.segmentedProgressBar1.Bars = new DownloadManagerPortal.Downloader.UIControls.Bar[0];
             this.segmentedProgressBar1.ContentLength = ((long)(100));
-            this.segmentedProgressBar1.Location = new System.Drawing.Point(8, 157);
+            this.segmentedProgressBar1.Location = new System.Drawing.Point(8, 191);
             this.segmentedProgressBar1.Name = "segmentedProgressBar1";
             this.segmentedProgressBar1.Size = new System.Drawing.Size(370, 18);
             this.segmentedProgressBar1.TabIndex = 13;
@@ -185,7 +196,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(392, 208);
+            this.ClientSize = new System.Drawing.Size(392, 250);
             this.Controls.Add(this.txtUrl);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.lblResumeability);
@@ -193,6 +204,7 @@
             this.Controls.Add(this.lblBytesReceived);
             this.Controls.Add(this.lblProgress);
             this.Controls.Add(this.lblSpeed);
+            this.Controls.Add(this.lblError);
             this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.lblServerFileName);
             this.Controls.Add(this.lblContentSize);
@@ -221,5 +233,6 @@
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Label lblProgress;
         private System.Windows.Forms.TextBox txtUrl;
+        private System.Windows.Forms.Label lblError;
     }
 }

@@ -69,6 +69,7 @@ namespace DownloadManagerPortal
                 listView1.Items[i].SubItems[s++].Text = mtdo.Speed.ToHumanReadableSize() + "/s";
                 listView1.Items[i].SubItems[s++].Text = mtdo.Info.AcceptRanges ? "Yes" : "No";
                 listView1.Items[i].SubItems[s++].Text = mtdo.Url;
+                listView1.SmallImageList.Images[i] = IconReader.GetFileIcon(mtdo.FilePath, IconReader.IconSize.Small, false).ToBitmap();
                 listView1.Items[i].ImageIndex = i;
             }
             else

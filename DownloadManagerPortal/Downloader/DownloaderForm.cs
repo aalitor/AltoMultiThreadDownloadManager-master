@@ -39,9 +39,9 @@ namespace DownloadManagerPortal.Downloader
             this.Load += DownloaderControl_Load;
             this.directStart = directStart;
             rootRangeDir = mtdo.RangeDir;
-            lblStatus.Text = dorg.Status.ToString();
-            this.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            lblStatus.Text = "Last Status: " + dorg.Status.ToString();
             this.Shown += DownloaderForm_Shown;
+            timer1.Tick+=timer1_Tick;
         }
         bool flagCloseAfterStop = false;
         void DownloaderForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -92,7 +92,7 @@ namespace DownloadManagerPortal.Downloader
         }
         void setButtonStatus(DownloaderStatus status)
         {
-            lblStatus.Text = status.ToString();
+            lblStatus.Text = "Last Status: " + status.ToString();
             saveMTDO();
             switch (status)
             {
@@ -184,7 +184,7 @@ namespace DownloadManagerPortal.Downloader
                 }
                 else
                 {
-                    MessageBox.Show("Remote file properties seems to be changed. Refresh the url");
+                    MessageBox.Show("Remote file properties seems to be changed. Refresh the url", "Url expired", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     requestNewUrl();
                 }
             }
@@ -195,7 +195,6 @@ namespace DownloadManagerPortal.Downloader
                     var resumeYes = MessageHelper.AskYes("Download doesn't have resumeability. It will be downloaded from beginning. Do you agree?");
                     if (resumeYes)
                     {
-                        timer1.Start();
                         DownloadAgain();
                     }
                 }
@@ -215,7 +214,10 @@ namespace DownloadManagerPortal.Downloader
         {
             if (!this.Visible)
                 this.Show(null);
-            dorg = new MultiThreadDownloadOrganizer(dorg.Url, Path.GetDirectoryName(dorg.FilePath), dorg.RangeDir, dorg.NofThread)
+
+            var tempFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            tempFolder = Path.Combine(tempFolder, "AltoDownloadAccelerator");
+            dorg = new MultiThreadDownloadOrganizer(dorg.Url, dorg.SaveDir, "", tempFolder, dorg.NofThread)
             {
                 DownloadRequestMessage = dorg.DownloadRequestMessage,
             };
@@ -232,7 +234,7 @@ namespace DownloadManagerPortal.Downloader
                 waiterForm.Close();
                 dorg.Url = msg.Url;
                 dorg.Info.Url = msg.Url;
-                this.Shown+=DownloaderForm_Shown;
+                this.Shown += DownloaderForm_Shown;
                 dorg.DownloadRequestMessage = msg;
                 if (dorg.Status == DownloaderStatus.Completed)
                 {
@@ -259,7 +261,8 @@ namespace DownloadManagerPortal.Downloader
             {
                 if (!(ex is WebException))
                 {
-                    MessageBox.Show(ex.Message + " " + ex.StackTrace);
+                    dorg.Stop();
+                    lblError.Text = "Last Error: " + ex.Message;
                 }
                 else
                 {
@@ -280,7 +283,7 @@ namespace DownloadManagerPortal.Downloader
                     }
                     else
                     {
-                        lblStatus.Text = ex.Message;
+                        lblError.Text = "Last Error: " + ex.Message;
                     }
                 }
             }
@@ -357,8 +360,10 @@ namespace DownloadManagerPortal.Downloader
                 {
                     var info = dorg.Info;
                     //Set the filename after we have ServerFileName determined
-                    dorg.FilePath = Path.Combine(dorg.FilePath, info.ServerFileName);
-                    dorg.RangeDir = Path.Combine(rootRangeDir, info.ServerFileName);
+                    dorg.SaveFileName = info.ServerFileName;
+                    var tempFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                    tempFolder = Path.Combine(tempFolder, "AltoDownloadAccelerator");
+                    dorg.RangeDir = Path.Combine(tempFolder, info.ServerFileName);
                     Directory.CreateDirectory(dorg.RangeDir);
                     foreach (var item in dorg.Ranges)
                     {
@@ -367,7 +372,6 @@ namespace DownloadManagerPortal.Downloader
                     //Set progress bar totallength
                     segmentedProgressBar1.ContentLength = info.ContentSize;
 
-                    timer1.Start();
                     btnPauseResume.Text = "Pause";
                     btnPauseResume.Enabled = info.AcceptRanges;
                     lblContentSize.Text = string.Format(lblContentSize.Text, info.ContentSize.ToHumanReadableSize());
@@ -383,13 +387,12 @@ namespace DownloadManagerPortal.Downloader
 
         private void dorg_Resumed(object sender, EventArgs e)
         {
-            timer1.Start();
+           
         }
 
         private void dorg_Stopped(object sender, EventArgs e)
         {
 
-            timer1.Stop();
             if (flagCloseAfterStop)
             {
                 flagCloseAfterStop = false;
@@ -407,28 +410,30 @@ namespace DownloadManagerPortal.Downloader
         {
             try
             {
-            }
-            catch (Exception ex)
-            {
-
-            }
-        }
-        private void btnOpenFile_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                Process.Start(dorg.FilePath);
+                segmentedProgressBar1.ContentLength = dorg.Info.ContentSize;
+                segmentedProgressBar1.Bars =
+                    dorg.Ranges.ToList().Select(x => new Bar(x.TotalBytesReceived, x.Start, x.Status)).ToArray();
+                progressBar1.Value = (int)(dorg.Progress * 100);
+                lblSpeed.Text = string.Format("Speed: {0}", dorg.Speed.ToHumanReadableSize() + "/s");
+                lblProgress.Text = "Progress: " + dorg.ProgressString;
+                lblBytesReceived.Text = string.Format("Bytes Received: {0} / {1}", dorg.TotalBytesReceived.ToHumanReadableSize(), dorg.Info.ContentSize.ToHumanReadableSize());
+                lblContentSize.Text = string.Format("Content Size: {0}", dorg.Info.ContentSize.ToHumanReadableSize());
+                lblServerFileName.Text = string.Format("Server Filename: {0}", dorg.Info.ServerFileName);
+                lblResumeability.Text = string.Format("{0}", dorg.Info.AcceptRanges ? "Yes" : "No");
+                lblResumeability.ForeColor = lblResumeability.Text == "Yes" ? Color.Green : Color.Red;
+                this.Text = dorg.Info.ServerFileName;
+                txtUrl.Text = dorg.Url;
             }
             catch
             {
 
             }
+            finally
+            {
+
+            }
         }
 
-        private void btnOpenFile_Click_1(object sender, EventArgs e)
-        {
-
-        }
 
 
 

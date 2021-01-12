@@ -173,6 +173,8 @@ namespace DownloadManagerPortal
                 }
                 else if (!f.dorg.IsActive)
                 {
+                    MessageBox.Show("Download already exists but stopped, it will be resumed",
+                        downloadRequest.FileName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                     f.dorg.Resume();
                     if (!f.Visible)
                         f.Show(null);
@@ -232,7 +234,7 @@ namespace DownloadManagerPortal
             var tempFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             tempFolder = Path.Combine(tempFolder, "AltoDownloadAccelerator");
             var nofThreads = 8;
-            var dorg = new MultiThreadDownloadOrganizer(MSG.Url, finalFolder, tempFolder, nofThreads);
+            var dorg = new MultiThreadDownloadOrganizer(MSG.Url, finalFolder, "", tempFolder, nofThreads);
             dorg.DownloadRequestMessage = MSG;
             return dorg;
         }
@@ -279,8 +281,13 @@ namespace DownloadManagerPortal
             {
                 var lvi = (ListViewItem)item;
                 var f = findDownloader(lvi.Text, "");
+                var folder = f.dorg.RangeDir;
                 removeForm(f.dorg.DownloadRequestMessage.FileName, f.dorg.DownloadRequestMessage.Url);
+                listView1.SmallImageList.Images.RemoveAt(lvi.Index);
                 listView1.Items.Remove(lvi);
+                if (Directory.Exists(folder))
+                    Directory.Delete(folder, true);
+
             }
             saveDownloadList();
         }

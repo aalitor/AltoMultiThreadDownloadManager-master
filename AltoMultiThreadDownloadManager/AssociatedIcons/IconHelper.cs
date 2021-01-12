@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace AltoMultiThreadDownloadManager.AssociatedIcons
@@ -64,7 +65,6 @@ namespace AltoMultiThreadDownloadManager.AssociatedIcons
 			{
 				flags += Shell32.SHGFI_LARGEICON ;
 			}
-
 			Shell32.SHGetFileInfo(	name, 
 				Shell32.FILE_ATTRIBUTE_NORMAL, 
 				ref shfi, 

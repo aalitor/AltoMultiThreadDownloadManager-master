@@ -81,13 +81,14 @@ namespace AltoMultiThreadDownloadManager
         /// <param name="finalPath">Final save path to merge all partial files downloaded</param>
         /// <param name="rangeDir">Temporary save path for partial downloads</param>
         /// <param name="nofThread">Number of async threads to download with</param>
-        public MultiThreadDownloadOrganizer(string url, string finalPath, string rangeDir, int nofThread)
+        public MultiThreadDownloadOrganizer(string url, string saveDir, string saveFileName, string rangeDir, int nofThread)
         {
             new GlobalLock();
             GlobalSettings.Set();
             Url = url;
             RangeDir = rangeDir;
-            FilePath = finalPath;
+            SaveDir = saveDir;
+            SaveFileName = saveFileName;
             NofThread = nofThread;
             stopTimer.Tick += stopTimer_Tick;
             aop = SC.AsyncOperationManager.CreateOperation(null);
@@ -514,7 +515,14 @@ namespace AltoMultiThreadDownloadManager
         /// <summary>
         /// Gets or sets final save path
         /// </summary>
-        public string FilePath { get; set; }
+        public string FilePath
+        {
+            get
+            {
+                return Path.Combine(SaveDir, string.IsNullOrEmpty(SaveFileName) ? "defaultfilename.unknown" : SaveFileName);
+
+            }
+        }
         /// <summary>
         /// Gets the temporary save path for partial downloads
         /// </summary>
@@ -535,6 +543,8 @@ namespace AltoMultiThreadDownloadManager
         /// Gets the download request message that was received via NativeMessaging from an external source
         /// e.g Chrome extension
         /// </summary>
+        public string SaveDir { get; set; }
+        public string SaveFileName { get; set; }
         public DownloadMessage DownloadRequestMessage { get; set; }
         public DownloadInfo LastInfo { get; set; }
         public DateTime LastTry { get; set; }
