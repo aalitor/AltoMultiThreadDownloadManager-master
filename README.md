@@ -18,4 +18,4 @@ This library provides multithreading download over Http. Using multithreading do
 
 <h2>Demo Application using native messaging</h2>
 
-<img src="https://i.imgur.com/v2aCA3Q.gif"></img>
+<img src="https://i.imgur.com/774e6Qp.gif"></img>
