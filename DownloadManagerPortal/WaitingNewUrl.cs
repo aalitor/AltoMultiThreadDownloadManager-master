@@ -29,5 +29,6 @@ namespace DownloadManagerPortal
         {
             this.Close();
         }
+        public string Id { get; set; }
     }
 }

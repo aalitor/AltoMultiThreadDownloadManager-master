@@ -140,7 +140,7 @@ namespace DownloadManagerPortal.SingleInstancing
                     }
                 }
             }
-            catch (SingleInstancingException ex)
+            catch
             {
                 return;
             }

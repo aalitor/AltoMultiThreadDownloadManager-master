@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.lblResumeability = new System.Windows.Forms.Label();
             this.btnPauseResume = new AltoControls.AltoButton();
             this.lblBytesReceived = new System.Windows.Forms.Label();
@@ -40,7 +41,9 @@
             this.lblProgress = new System.Windows.Forms.Label();
             this.txtUrl = new System.Windows.Forms.TextBox();
             this.lblError = new System.Windows.Forms.Label();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.segmentedProgressBar1 = new DownloadManagerPortal.Downloader.UIControls.SegmentedProgressBar();
+            this.lblActiveThreads = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // lblResumeability
@@ -174,6 +177,12 @@
             this.lblError.TabIndex = 14;
             this.lblError.Text = "Last Error:";
             // 
+            // timer1
+            // 
+            this.timer1.Enabled = true;
+            this.timer1.Interval = 1;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
             // segmentedProgressBar1
             // 
             this.segmentedProgressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -186,6 +195,16 @@
             this.segmentedProgressBar1.Size = new System.Drawing.Size(370, 18);
             this.segmentedProgressBar1.TabIndex = 13;
             // 
+            // lblActiveThreads
+            // 
+            this.lblActiveThreads.AutoSize = true;
+            this.lblActiveThreads.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.lblActiveThreads.Location = new System.Drawing.Point(238, 139);
+            this.lblActiveThreads.Name = "lblActiveThreads";
+            this.lblActiveThreads.Size = new System.Drawing.Size(82, 13);
+            this.lblActiveThreads.TabIndex = 20;
+            this.lblActiveThreads.Text = "Active Threads:";
+            // 
             // DownloaderForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -196,6 +215,7 @@
             this.Controls.Add(this.lblResumeability);
             this.Controls.Add(this.btnPauseResume);
             this.Controls.Add(this.lblBytesReceived);
+            this.Controls.Add(this.lblActiveThreads);
             this.Controls.Add(this.lblProgress);
             this.Controls.Add(this.lblSpeed);
             this.Controls.Add(this.lblError);
@@ -227,5 +247,7 @@
         private System.Windows.Forms.Label lblProgress;
         private System.Windows.Forms.TextBox txtUrl;
         private System.Windows.Forms.Label lblError;
+        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Label lblActiveThreads;
     }
 }

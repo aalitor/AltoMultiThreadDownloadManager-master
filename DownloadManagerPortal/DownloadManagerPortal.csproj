@@ -66,6 +66,9 @@
     <Compile Include="DownloadCenterForm.Designer.cs">
       <DependentUpon>DownloadCenterForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Downloader\DownloaderFormErrorHandling.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="DownloadCompletedForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -78,7 +81,7 @@
     <Compile Include="Downloader\DownloaderForm.Designer.cs">
       <DependentUpon>DownloaderForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="DownloaderFormListViewOperations.cs">
+    <Compile Include="DownloadCenterFormListViewOperations.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Downloader\UIControls\Bar.cs" />

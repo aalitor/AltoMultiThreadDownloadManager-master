@@ -59,21 +59,17 @@ namespace AltoMultiThreadDownloadManager
         /// Raised when download completed and partial files merged
         /// </summary>
         public event EventHandler<EventArgs> MergeCompleted;
-        /// <summary>
-        /// Raised when file validation progress changed
-        /// </summary>
+
         public event EventHandler<ChecksumValidationProgressChangedEventArgs> ChecksumValidationProgressChanged;
         public event EventHandler<StatusChangedEventArgs> StatusChanged;
         private DownloaderStatus status;
         private Stopwatch stp = new Stopwatch();
-        private bool flagStop = false;
         private List<RangeDownloader> cdList = new List<RangeDownloader>();
         private long totalBytesMerged;
         private bool flagMerged = false;
         private System.Windows.Forms.Timer stopTimer = new System.Windows.Forms.Timer();
         private long speedBytesOffset;
         private SC.AsyncOperation aop;
-
         /// <summary>
         /// Calls constructor for the downloader object
         /// </summary>
@@ -88,8 +84,8 @@ namespace AltoMultiThreadDownloadManager
             Url = url;
             RangeDir = rangeDir;
             SaveDir = saveDir;
-            SaveFileName = saveFileName;
             NofThread = nofThread;
+            SaveFileName = saveFileName;
             stopTimer.Tick += stopTimer_Tick;
             aop = SC.AsyncOperationManager.CreateOperation(null);
             speedBytesOffset = 0;
@@ -141,7 +137,7 @@ namespace AltoMultiThreadDownloadManager
 
         private void cd_Failed(object sender, ErrorEventArgs e)
         {
-            if (flagStop)
+            if (FlagStop)
                 return;
             ErrorOccured.Raise(sender, e, aop);
         }
@@ -178,10 +174,9 @@ namespace AltoMultiThreadDownloadManager
                 var chunkedHeader = e.Response.Headers[HttpResponseHeader.TransferEncoding];
                 UseChunk = chunkedHeader != null && chunkedHeader.ToLower() == "chunked";
                 Ranges.First().End = Info.ContentSize - 1;
-                NofThread = Info.AcceptRanges ? NofThread : 1;
+                //NofThread = Info.AcceptRanges ? NofThread : 1;
                 DownloadInfoReceived.Raise(this, EventArgs.Empty);
             }
-            var r = Ranges.First(x => x.FileId == cd.Range.FileId);
             createNewThreadIfRequired();
         }
 
@@ -222,7 +217,7 @@ namespace AltoMultiThreadDownloadManager
         /// </summary>
         public void Stop()
         {
-            flagStop = true;
+            FlagStop = true;
             stp.Stop();
             if (Ranges.All(x => x.IsIdle))
             {
@@ -235,7 +230,7 @@ namespace AltoMultiThreadDownloadManager
         }
         void stopTimer_Tick(object sender, EventArgs e)
         {
-            if (!flagStop)
+            if (!FlagStop)
             {
                 stopTimer.Stop();
                 return;
@@ -261,7 +256,7 @@ namespace AltoMultiThreadDownloadManager
                 return;
             }
             speedBytesOffset = TotalBytesReceived;
-            flagStop = false;
+            FlagStop = false;
             stp.Reset();
             stp.Start();
             createNewThreadIfRequired();
@@ -306,12 +301,14 @@ namespace AltoMultiThreadDownloadManager
 
             lock (GlobalLock.Locker)
             {
-                if (flagStop)
+                if (FlagStop)
                     return;
                 if (Info == null || !Info.AcceptRanges)
                     return;
+                var realNofMaxThread = Info.AcceptRanges ? NofThread : 1;
+
                 var nofCurrentThreads = (Ranges.Count(x => !x.IsIdle));
-                var reqThreads = NofThread - nofCurrentThreads;
+                var reqThreads = realNofMaxThread - nofCurrentThreads;
                 if (reqThreads > 0)
                 {
                     var avRanges = Ranges.Where(x => !x.IsDownloaded);
@@ -369,6 +366,15 @@ namespace AltoMultiThreadDownloadManager
                         Ranges.Add(next);
                         var cd = CreateNewRangeDownloader(next);
                         cd.Download();
+                    }
+                }
+                else if(reqThreads < 0)
+                {
+                    var temp = cdList.Where(x=> !x.Range.IsDownloaded && !x.Range.IsIdle);
+                    if(temp.Any())
+                    {
+                        var first = temp.OrderByDescending(x=>x.Range.Remaining.Size).First();
+                        first.Stop();
                     }
                 }
             }
@@ -458,10 +464,7 @@ namespace AltoMultiThreadDownloadManager
         /// </summary>
         public string Id { get; set; }
 
-        /// <summary>
-        /// Gets or sets the number of max async threads
-        /// </summary>
-        public int NofThread { get; set; }
+        
         /// <summary>
         /// Gets the download speed
         /// </summary>
@@ -545,6 +548,17 @@ namespace AltoMultiThreadDownloadManager
         /// e.g Chrome extension
         /// </summary>
         public string SaveDir { get; set; }
+        /// <summary>
+        /// Gets or sets the number of max async threads
+        /// </summary>
+        public bool FlagStop
+        {
+            get;
+            private set;
+        }
+
+        public int NofThread;
+        
         public string SaveFileName { get; set; }
         public DownloadMessage DownloadRequestMessage { get; set; }
         public DownloadInfo LastInfo { get; set; }

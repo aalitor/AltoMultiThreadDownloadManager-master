@@ -7,17 +7,33 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using AltoMultiThreadDownloadManager.Helpers;
 using AltoMultiThreadDownloadManager.AssociatedIcons;
+using DownloadManagerPortal.Downloader;
 namespace DownloadManagerPortal
 {
     public partial class DownloadCenterForm : Form
     {
         void AddRows()
         {
-            
+
         }
+        DownloaderForm getSelectedItem()
+        {
+            if (listView1.SelectedItems.Count < 1)
+                return null;
+
+            var filename = listView1.SelectedItems[0].Text;
+            var url = listView1.SelectedItems[0].SubItems[7].Text;
+
+            return findDownloader(filename, url);
+        }
+
         void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            
+            var f = getSelectedItem();
+            if (f == null || f.dorg == null)
+                return;
+
+            nmdMaxThread.Value = f.dorg.NofThread;
         }
 
         void disableButtonsIfActive()
@@ -74,7 +90,7 @@ namespace DownloadManagerPortal
             }
             else
             {
-                var lvi = new ListViewItem( mtdo.Info.ServerFileName);
+                var lvi = new ListViewItem(mtdo.Info.ServerFileName);
                 lvi.SubItems.Add(mtdo.ProgressString);
                 lvi.SubItems.Add(mtdo.TotalBytesReceived.ToHumanReadableSize());
                 lvi.SubItems.Add(mtdo.Info.ContentSize.ToHumanReadableSize());

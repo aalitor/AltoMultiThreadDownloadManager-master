@@ -166,6 +166,8 @@ namespace AltoMultiThreadDownloadManager
             stopFlag = true;
             if (request != null)
                 request.Abort();
+            if (th != null)
+                th.Abort();
         }
         private volatile bool stopFlag;
         public int TryCount { get; set; }

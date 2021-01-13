@@ -27,7 +27,6 @@ namespace DownloadManagerPortal.Downloader
         public bool NewUrlRequested { get; set; }
         bool directStart;
         string rootRangeDir;
-        WaitingNewUrl waiterForm;
 
         public DownloaderForm(MultiThreadDownloadOrganizer mtdo, bool directStart = true)
         {
@@ -51,27 +50,7 @@ namespace DownloadManagerPortal.Downloader
                 dorg.Stop();
             }
         }
-        void closeWaiterFormIfOpen()
-        {
-            var f = findWaiterForm();
-            if (f == null)
-                return;
-            if (f.Visible)
-                f.Close();
-        }
-        WaitingNewUrl findWaiterForm()
-        {
-            var f = Application.OpenForms.Cast<Form>()
-                .Where(x => x is DownloaderForm)
-                .Select(x => (DownloaderForm)x)
-                .FirstOrDefault(x => x != null && x.dorg != null && x.dorg.Id == this.dorg.Id);
-            return f == null ? null : f.waiterForm;
-        }
-        bool checkWaiterOpen()
-        {
-            var f = findWaiterForm();
-            return f != null && f.Visible;
-        }
+
         void setDownloaderEvents()
         {
             dorg.Stopped += dorg_Stopped;
@@ -83,6 +62,8 @@ namespace DownloadManagerPortal.Downloader
             dorg.ErrorOccured += dorg_ErrorOccured;
             dorg.StatusChanged += dorg_StatusChanged;
         }
+
+
         void saveMTDO()
         {
             if (dorg == null || dorg.Info == null)
@@ -126,7 +107,6 @@ namespace DownloadManagerPortal.Downloader
                     btnPauseResume.Enabled = true;
                     this.ControlBox = true;
                     this.Enabled = true;
-                    closeWaiterFormIfOpen();
                     break;
                 case DownloaderStatus.MergingFiles:
                     btnPauseResume.Enabled = false;
@@ -192,6 +172,8 @@ namespace DownloadManagerPortal.Downloader
                     {
                         dorg.Stop();
                     }
+                    else
+                        btnPauseResume.Enabled = true;
                 }
                 else
                     dorg.Stop();
@@ -199,17 +181,7 @@ namespace DownloadManagerPortal.Downloader
             }
             else if (dorg.Status == DownloaderStatus.Completed)
             {
-                var currentInfo = dorg.getCurrentInformations();
-                if (dorg.LastInfo != null && dorg.LastInfo.Equals(currentInfo))
-                {
-                    DownloadAgain();
-                }
-                else if(!NewUrlRequested)
-                {
-                    NewUrlRequested = true;
-                    MessageBox.Show("Remote file properties seems to be changed. Refresh the url", "Url expired", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    requestNewUrl();
-                }
+                HandleAlreadyCompleted();
             }
             else
             {
@@ -220,6 +192,8 @@ namespace DownloadManagerPortal.Downloader
                     {
                         DownloadAgain();
                     }
+                    else
+                        btnPauseResume.Enabled = true;
                 }
                 else
                     dorg.Resume();
@@ -233,11 +207,22 @@ namespace DownloadManagerPortal.Downloader
             var p = (FlowLayoutPanel)this.Parent;
             p.Controls.Remove(this);
         }
+        public void HandleAlreadyCompleted()
+        {
+            var currentInfo = dorg.getCurrentInformations();
+            if (dorg.LastInfo != null && dorg.LastInfo.Equals(currentInfo))
+            {
+                DownloadAgain();
+            }
+            else if (!NewUrlRequested)
+            {
+                NewUrlRequested = true;
+                MessageBox.Show("Remote file properties seems to be changed. Refresh the url", "Url expired", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                RequestNewUrl();
+            }
+        }
         public void DownloadAgain()
         {
-            if (!this.Visible)
-                this.Show(null);
-
             var tempFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             tempFolder = Path.Combine(tempFolder, "AltoDownloadAccelerator");
             dorg = new MultiThreadDownloadOrganizer(dorg.Url, dorg.SaveDir, "", tempFolder, dorg.NofThread)
@@ -251,84 +236,56 @@ namespace DownloadManagerPortal.Downloader
         }
         public void RefreshUrl(DownloadMessage msg)
         {
-            if (!this.Visible)
-                this.Show(null);
-            this.Invoke((MethodInvoker)delegate
+            CloseWaiterFormIfOpen();
+            dorg.Url = msg.Url;
+            dorg.Info.Url = msg.Url;
+            dorg.DownloadRequestMessage = msg;
+            this.Activate();
+            if (dorg.Status == DownloaderStatus.Completed)
             {
-                this.Activate();
-                dorg.Url = msg.Url;
-                dorg.Info.Url = msg.Url;
-                this.Shown += DownloaderForm_Shown;
-                dorg.DownloadRequestMessage = msg;
-                if (dorg.Status == DownloaderStatus.Completed)
-                {
-                    DownloadAgain();
-                }
-                else if (dorg.Status == DownloaderStatus.Stopped)
-                    dorg.Resume();
-                NewUrlRequested = false;
-            });
+                DownloadAgain();
+            }
+            else if (dorg.Status == DownloaderStatus.Stopped)
+                dorg.Resume();
+            NewUrlRequested = false;
+
         }
         private void dorg_ErrorOccured(object sender, System.IO.ErrorEventArgs e)
         {
-            var ex = e.GetException();
-
-            var wform = findWaiterForm();
-            if (ex is RemoteFilePropertiesChangedException && !NewUrlRequested && !checkWaiterOpen())
-            {
-                NewUrlRequested = true;
-                if (dorg.IsActive)
-                    dorg.Stop();
-                MessageBox.Show("Remote file properties seems to be changed. Refresh the url");
-
-                requestNewUrl();
-            }
-            else
-            {
-                if (!(ex is WebException))
-                {
-                    dorg.Stop();
-                    lblError.Text = "Last Error: " + ex.Message;
-                }
-                else
-                {
-                    var webex = (WebException)ex;
-                    if (webex == null)
-                        return;
-                    var response = (HttpWebResponse)webex.Response;
-                    if (response != null)
-                    {
-                        var status = response.StatusCode;
-                        if (!checkWaiterOpen() && status == (HttpStatusCode)403 && (dorg.Info == null || !dorg.LastInfo.Equals(dorg.getCurrentInformations()))
-                            && !NewUrlRequested)
-                        {
-                            NewUrlRequested = true;
-                            if (dorg.IsActive)
-                                dorg.Stop();
-                            MessageBox.Show("Remote file properties seems to be changed. Refresh the url");
-                            requestNewUrl();
-                        }
-                    }
-                    else
-                    {
-                        lblError.Text = "Last Error: " + ex.Message;
-                    }
-                }
-            }
+            handleError(e.GetException());
+           
         }
-        void requestNewUrl()
+
+        void CloseWaiterFormIfOpen()
+        {
+            if (waiterForm != null)
+                waiterForm.Close();
+        }
+        WaitingNewUrl findWaiterForm(string id)
+        {
+            var f1 = Application.OpenForms.Cast<Form>()
+                .Where(x => x is WaitingNewUrl);
+            if (!f1.Any()) return null;
+            var f2 = f1.Select(x => (WaitingNewUrl)x)
+                .FirstOrDefault(x => x != null && x.Id == id);
+            return f2 == null ? null : f2;
+        }
+        WaitingNewUrl waiterForm;
+        public void RequestNewUrl()
         {
 
             NewUrlRequested = true;
+
             waiterForm = new WaitingNewUrl();
-            waiterForm.FormClosed += (m, n) => NewUrlRequested = true;
+            waiterForm.Id = dorg.Id;
+            waiterForm.FormClosed += (m, n) => NewUrlRequested = false;
             waiterForm.Shown += (m, n) => waiterForm.Activate();
-            Process.Start(dorg.DownloadRequestMessage.TabUrl);
             waiterForm.TopMost = true;
-            this.Hide();
+            
+
+            Process.Start(dorg.DownloadRequestMessage.TabUrl);
             waiterForm.ShowDialog();
         }
-        int mergprogress = 0;
         void DownloaderForm_Shown(object sender, EventArgs e)
         {
             this.Activate();
@@ -341,19 +298,7 @@ namespace DownloadManagerPortal.Downloader
 
         private void dorg_ProgressChanged(object sender, AltoMultiThreadDownloadManager.EventArguments.ProgressChangedEventArgs e)
         {
-            segmentedProgressBar1.ContentLength = dorg.Info.ContentSize;
-            segmentedProgressBar1.Bars =
-                dorg.Ranges.ToList().Select(x => new Bar(x.TotalBytesReceived, x.Start, x.Status)).ToArray();
-            progressBar1.Value = (int)(dorg.Progress * 100);
-            lblSpeed.Text = string.Format("Speed: {0}", dorg.Speed.ToHumanReadableSize() + "/s");
-            lblProgress.Text = "Progress: " + dorg.ProgressString;
-            lblBytesReceived.Text = string.Format("Bytes Received: {0} / {1}", dorg.TotalBytesReceived.ToHumanReadableSize(), dorg.Info.ContentSize.ToHumanReadableSize());
-            lblContentSize.Text = string.Format("Content Size: {0}", dorg.Info.ContentSize.ToHumanReadableSize());
-            lblServerFileName.Text = string.Format("Server Filename: {0}", dorg.Info.ServerFileName);
-            lblResumeability.Text = string.Format("{0}", dorg.Info.AcceptRanges ? "Yes" : "No");
-            lblResumeability.ForeColor = lblResumeability.Text == "Yes" ? Color.Green : Color.Red;
-            this.Text = dorg.Info.ServerFileName;
-            txtUrl.Text = dorg.Url;
+
         }
 
         private void dorg_Completed(object sender, EventArgs e)
@@ -400,7 +345,7 @@ namespace DownloadManagerPortal.Downloader
                     lblResumeability.Text = string.Format(lblResumeability.Text, info.AcceptRanges);
                 });
             }
-            catch (Exception ex)
+            catch
             {
 
             }
@@ -408,7 +353,7 @@ namespace DownloadManagerPortal.Downloader
 
         private void dorg_Resumed(object sender, EventArgs e)
         {
-           
+
         }
 
         private void dorg_Stopped(object sender, EventArgs e)
@@ -422,5 +367,29 @@ namespace DownloadManagerPortal.Downloader
             }
         }
 
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            updateUI();
+        }
+
+        void updateUI()
+        {
+            if (dorg == null || dorg.Info == null)
+                return;
+            segmentedProgressBar1.ContentLength = dorg.Info.ContentSize;
+            segmentedProgressBar1.Bars =
+                dorg.Ranges.ToList().Select(x => new Bar(x.TotalBytesReceived, x.Start, x.Status)).ToArray();
+            progressBar1.Value = (int)(dorg.Progress * 100);
+            lblSpeed.Text = string.Format("Speed: {0}", dorg.Speed.ToHumanReadableSize() + "/s");
+            lblProgress.Text = "Progress: " + dorg.ProgressString;
+            lblBytesReceived.Text = string.Format("Bytes Received: {0} / {1}", dorg.TotalBytesReceived.ToHumanReadableSize(), dorg.Info.ContentSize.ToHumanReadableSize());
+            lblContentSize.Text = string.Format("Content Size: {0}", dorg.Info.ContentSize.ToHumanReadableSize());
+            lblServerFileName.Text = string.Format("Server Filename: {0}", dorg.Info.ServerFileName);
+            lblResumeability.Text = string.Format("{0}", dorg.Info.AcceptRanges ? "Yes" : "No");
+            lblResumeability.ForeColor = lblResumeability.Text == "Yes" ? Color.Green : Color.Red;
+            lblActiveThreads.Text = "Active Threads: " + dorg.NofActiveThreads.ToString();
+            this.Text = dorg.Info.ServerFileName;
+            txtUrl.Text = dorg.Url;
+        }
     }
 }

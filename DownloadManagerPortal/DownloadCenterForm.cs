@@ -135,10 +135,15 @@ namespace DownloadManagerPortal
             var a = (DownloaderForm)sender;
             a.dorg.Stop();
             removeForm(a.dorg.DownloadRequestMessage.FileName, a.dorg.DownloadRequestMessage.Url);
-            a = new DownloaderForm(a.dorg, false);
+            a = new DownloaderForm(a.dorg, false)
+            {
+                NewUrlRequested = a.NewUrlRequested
+            };
             a.FormClosed += a_FormClosed;
             formlist.Add(a);
             this.Activate();
+
+            
         }
         public void OnMessageReceived(MessageEventArgs e)
         {
@@ -173,11 +178,20 @@ namespace DownloadManagerPortal
                         f.dorg.Url = downloadRequest.Url;
                         f.dorg.Info.Url = downloadRequest.Url;
                         f.dorg.DownloadRequestMessage = downloadRequest;
-                        f.DownloadAgain();
+                        f.Show(null);
+                        f.HandleAlreadyCompleted();
                     }
                 }
                 else if (!f.dorg.IsActive)
                 {
+                    Directory.CreateDirectory(f.dorg.RangeDir);
+                    foreach (var item in f.dorg.Ranges)
+                    {
+                        if(!File.Exists(item.FilePath))
+                        {
+                            item.TotalBytesReceived = 0;
+                        }
+                    }
                     this.Activate();
                     f.dorg.Resume();
                     if (!f.Visible)
@@ -194,6 +208,7 @@ namespace DownloadManagerPortal
             });
         }
 
+        
 
 
 
@@ -282,7 +297,7 @@ namespace DownloadManagerPortal
         {
             if (listView1.SelectedItems.Count < 1)
                 return;
-            if (MessageHelper.AskYes("Are you sure to delete the selected items?")) ;
+            if (MessageHelper.AskYes("Are you sure to delete the selected items?")) 
             foreach (var item in listView1.SelectedItems)
             {
                 var lvi = (ListViewItem)item;
@@ -335,6 +350,19 @@ namespace DownloadManagerPortal
             }
             return isElevated;
         }
+
+        private void btnApplyThreads_Click(object sender, EventArgs e)
+        {
+            var f = getSelectedItem();
+            if (f == null || f.dorg == null)
+                return;
+
+            f.dorg.NofThread = (int)nmdMaxThread.Value;
+
+            MessageBox.Show("Applied!", f.dorg.Info.ServerFileName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        
 
     }
 }

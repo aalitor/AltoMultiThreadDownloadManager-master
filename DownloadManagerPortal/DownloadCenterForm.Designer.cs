@@ -43,6 +43,9 @@
             this.btnDelete = new AltoControls.AltoButton();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.btnIntegrateChrome = new AltoControls.AltoButton();
+            this.nmdMaxThread = new System.Windows.Forms.NumericUpDown();
+            this.btnApplyThreads = new AltoControls.AltoButton();
+            ((System.ComponentModel.ISupportInitialize)(this.nmdMaxThread)).BeginInit();
             this.SuspendLayout();
             // 
             // btnAddDownload
@@ -196,13 +199,58 @@
             this.btnIntegrateChrome.Transparency = false;
             this.btnIntegrateChrome.Click += new System.EventHandler(this.btnIntegrateChrome_Click);
             // 
+            // nmdMaxThread
+            // 
+            this.nmdMaxThread.Location = new System.Drawing.Point(450, 17);
+            this.nmdMaxThread.Maximum = new decimal(new int[] {
+            32,
+            0,
+            0,
+            0});
+            this.nmdMaxThread.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.nmdMaxThread.Name = "nmdMaxThread";
+            this.nmdMaxThread.Size = new System.Drawing.Size(49, 20);
+            this.nmdMaxThread.TabIndex = 14;
+            this.nmdMaxThread.Value = new decimal(new int[] {
+            8,
+            0,
+            0,
+            0});
+            // 
+            // btnApplyThreads
+            // 
+            this.btnApplyThreads.Active1 = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(168)))), ((int)(((byte)(183)))));
+            this.btnApplyThreads.Active2 = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(164)))), ((int)(((byte)(183)))));
+            this.btnApplyThreads.BackColor = System.Drawing.Color.Transparent;
+            this.btnApplyThreads.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.btnApplyThreads.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.btnApplyThreads.ForeColor = System.Drawing.Color.Black;
+            this.btnApplyThreads.Inactive1 = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(188)))), ((int)(((byte)(210)))));
+            this.btnApplyThreads.Inactive2 = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(167)))), ((int)(((byte)(188)))));
+            this.btnApplyThreads.Location = new System.Drawing.Point(505, 17);
+            this.btnApplyThreads.Name = "btnApplyThreads";
+            this.btnApplyThreads.Radius = 10;
+            this.btnApplyThreads.Size = new System.Drawing.Size(57, 20);
+            this.btnApplyThreads.Stroke = false;
+            this.btnApplyThreads.StrokeColor = System.Drawing.Color.Gray;
+            this.btnApplyThreads.TabIndex = 12;
+            this.btnApplyThreads.Text = "Apply";
+            this.btnApplyThreads.Transparency = false;
+            this.btnApplyThreads.Click += new System.EventHandler(this.btnApplyThreads_Click);
+            // 
             // DownloadCenterForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(775, 291);
+            this.Controls.Add(this.nmdMaxThread);
             this.Controls.Add(this.listView1);
             this.Controls.Add(this.btnIntegrateChrome);
+            this.Controls.Add(this.btnApplyThreads);
             this.Controls.Add(this.btnDelete);
             this.Controls.Add(this.btnResume);
             this.Controls.Add(this.btnAddDownload);
@@ -210,6 +258,7 @@
             this.Name = "DownloadCenterForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Download Center";
+            ((System.ComponentModel.ISupportInitialize)(this.nmdMaxThread)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -230,5 +279,7 @@
         private System.Windows.Forms.ColumnHeader columnHeader7;
         private System.Windows.Forms.ColumnHeader columnHeader8;
         private AltoControls.AltoButton btnIntegrateChrome;
+        private System.Windows.Forms.NumericUpDown nmdMaxThread;
+        private AltoControls.AltoButton btnApplyThreads;
     }
 }
