@@ -1,8 +1,6 @@
 ﻿using AltoMultiThreadDownloadManager;
-using AltoMultiThreadDownloadManager.Exceptions;
 using AltoMultiThreadDownloadManager.NativeMessages;
 using DownloadManagerPortal.Downloader.UIControls;
-using DownloadManagerPortal.SingleInstancing;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -10,7 +8,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Windows.Forms;
 using AltoMultiThreadDownloadManager.Helpers;
 namespace DownloadManagerPortal.Downloader
@@ -93,6 +90,7 @@ namespace DownloadManagerPortal.Downloader
         void setButtonStatus(DownloaderStatus status)
         {
             lblStatus.Text = "Last Status: " + status.ToString();
+            this.TopMost = false;
             switch (status)
             {
                 case DownloaderStatus.Completed:
@@ -312,8 +310,17 @@ namespace DownloadManagerPortal.Downloader
         {
             if (dorg != null && dorg.Status == DownloaderStatus.Completed)
             {
-                new DownloadCompletedForm(dorg).Show(new Form());
+                var c = new DownloadCompletedForm(dorg);
+                c.TopMost = true;
+                c.Shown += c_Shown;
+                c.Show();
             }
+        }
+
+        void c_Shown(object sender, EventArgs e)
+        {
+            var c = sender as DownloadCompletedForm;
+            c.TopMost = false;
         }
 
         private void dorg_DownloadInfoReceived(object sender, EventArgs e)

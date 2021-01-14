@@ -50,7 +50,13 @@ namespace DownloadManagerPortal
                 }
             }
             else
+            {
                 saveDownloadList();
+                notifyIcon1.Visible = false;
+                notifyIcon1.Icon = null;
+                notifyIcon1.Dispose();
+                notifyIcon1 = null;
+            }
         }
         bool flagCloseAfterStop = true;
         void dorg_Stopped(object sender, EventArgs e)
@@ -59,12 +65,25 @@ namespace DownloadManagerPortal
             {
                 flagCloseAfterStop = false;
                 saveDownloadList();
+                notifyIcon1.Visible = false;
+                notifyIcon1.Icon = null;
+                notifyIcon1.Dispose();
+                
                 Application.Exit();
             }
         }
 
         void DownloadCenterForm_Load(object sender, EventArgs e)
         {
+            var cm = new ContextMenu();
+            var m = new MenuItem("Exit");
+            m.Click += (a, n) =>
+            {
+                this.Close();
+                Application.Exit();
+            };
+            cm.MenuItems.Add(m);
+            notifyIcon1.ContextMenu = cm;
             readSettings();
             AddRows();
             foreach (var item in formlist)
@@ -119,21 +138,20 @@ namespace DownloadManagerPortal
             }
             else
             {
-
                 removeForm(req.FileName, req.Url);
                 var a = new DownloaderForm(f.dorg, directStart);
                 a.FormClosed += a_FormClosed;
                 formlist.Add(a);
                 a.Shown += a_Shown;
-                a.Show(new DownloadCenterForm());
+                a.Show();
             }
         }
 
         void a_Shown(object sender, EventArgs e)
         {
             var f = (DownloaderForm)sender;
-            this.BringToFront();
-            f.BringToFront();
+            f.Shown += f_Shown;
+            f.TopMost = true;
         }
 
         void a_FormClosed(object sender, FormClosedEventArgs e)
@@ -147,7 +165,7 @@ namespace DownloadManagerPortal
             };
             a.FormClosed += a_FormClosed;
             formlist.Add(a);
-            this.Activate();
+            
 
 
         }
@@ -159,6 +177,10 @@ namespace DownloadManagerPortal
                 var downloadRequest = JsonConvert.DeserializeObject<DownloadMessage>(msg);
 
                 var f = findDownloader(downloadRequest.FileName, downloadRequest.Url);
+                if (f != null)
+                {
+                    f.TopMost = true;
+                }
                 var completed = checkDownloadCompleted(f);
 
                 if (f == null)
@@ -180,7 +202,7 @@ namespace DownloadManagerPortal
                     f.dorg.Url = downloadRequest.Url;
                     f.dorg.Info.Url = downloadRequest.Url;
                     f.dorg.DownloadRequestMessage = downloadRequest;
-                    f.Show(new DownloadCenterForm());
+                    f.Show();
                     var result = MessageBox.Show("Download already completed! Do you want to download again?",
                         downloadRequest.FileName, MessageBoxButtons.YesNo);
                     if (result == System.Windows.Forms.DialogResult.Yes)
@@ -200,20 +222,26 @@ namespace DownloadManagerPortal
                             item.TotalBytesReceived = 0;
                         }
                     }
-                    this.Activate();
                     f.dorg.Resume();
                     if (!f.Visible)
-                        f.Show(new DownloadCenterForm());
-                    f.Activate();
+                        f.Show();
                 }
                 else if (f.dorg.IsActive)
                 {
                     this.Activate();
                     if (!f.Visible)
-                        f.Show(new DownloadCenterForm());
-                    f.Activate();
+                        f.Show();
                 }
             });
+        }
+
+        void f_Shown(object sender, EventArgs e)
+        {
+            var f = sender as DownloaderForm;
+            
+            f.Activate();
+            f.Focus();
+            f.ShowInTaskbar = false;
         }
 
 
@@ -376,6 +404,14 @@ namespace DownloadManagerPortal
         private void btnSettings_Click(object sender, EventArgs e)
         {
             new DownloadSettingsForm().ShowDialog();
+        }
+
+        private void notifyIcon1_MouseClick(object sender, MouseEventArgs e)
+        {
+            if(e.Button == System.Windows.Forms.MouseButtons.Right)
+            {
+                notifyIcon1.ContextMenu.Show(this, Cursor.Position);
+            }
         }
 
 
