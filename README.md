@@ -38,7 +38,6 @@ void downloader_DownloadInfoReceived(object sender, EventArgs e)
 	var downloader = (MultiThreadDownloadOrganizer)sender;
 	//You can change the save filename after informations received
 	downloader.SaveFileName = downloader.Info.ServerFileName;
-	
 	lblContentSize.Text = downloader.Info.ContentSize.ToHumanReadableSize();
 	lblServerFileName.Text = downloader.Info.ServerFileName;
 	lblResumeability.Text = downloader.Info.AcceptRanges ? "Yes" : "No";
