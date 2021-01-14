@@ -2,9 +2,12 @@
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http.Headers;
+using System.Net.Mime;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
+using System.Windows.Forms;
 
 namespace AltoMultiThreadDownloadManager.Helpers
 {
@@ -22,6 +25,8 @@ namespace AltoMultiThreadDownloadManager.Helpers
         {
             var cdHeader = resp.Headers["Content-Disposition"];
             var location = resp.Headers["Location"];
+
+
             if (!string.IsNullOrEmpty(cdHeader))
             {
                 var pattern = string.Format("filename[^;=\n]*=((['\"]).*?{0}|[^;\n]*)", Regex.Escape("2"));
@@ -65,7 +70,7 @@ namespace AltoMultiThreadDownloadManager.Helpers
                         return HttpUtility.UrlDecode(first.ReplaceInvalidChars());
                 }
 
-				return "index.html";
+                return "index.html";
             }
         }
 
@@ -88,7 +93,7 @@ namespace AltoMultiThreadDownloadManager.Helpers
         {
             return filename.HasExtension() && !filename.HasInvalidChar();
         }
-
+       
     }
 
 }

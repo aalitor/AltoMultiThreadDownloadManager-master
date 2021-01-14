@@ -8,9 +8,10 @@ using System.Windows.Forms;
 using AltoMultiThreadDownloadManager.Helpers;
 using AltoMultiThreadDownloadManager.AssociatedIcons;
 using DownloadManagerPortal.Downloader;
+using System.IO;
 namespace DownloadManagerPortal
 {
-    public partial class DownloadCenterForm : Form
+    public partial class DownloadCenterForm
     {
         void AddRows()
         {
@@ -27,15 +28,6 @@ namespace DownloadManagerPortal
             return findDownloader(filename, url);
         }
 
-        void listView1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            var f = getSelectedItem();
-            if (f == null || f.dorg == null)
-                return;
-
-            nmdMaxThread.Value = f.dorg.NofThread;
-        }
-
         void disableButtonsIfActive()
         {
             if (listView1.SelectedItems.Count < 1)
@@ -44,10 +36,15 @@ namespace DownloadManagerPortal
                 btnDelete.Enabled = false;
                 return;
             }
+            if (listView1.SelectedItems.Count > 1)
+            {
+                btnResume.Enabled = false;
+                btnDelete.Enabled = true;
+                return;
+            }
 
-            var lvi = listView1.SelectedItems[0];
+            var f = getSelectedItem();
 
-            var f = findDownloader(lvi.Text, lvi.SubItems[7].Text);
 
             if (f == null || f.dorg == null)
             {
@@ -116,6 +113,36 @@ namespace DownloadManagerPortal
             }
 
             disableButtonsIfActive();
+        }
+
+        private void btnDelete_Click(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count < 1)
+                return;
+            if (MessageHelper.AskYes("Are you sure to delete the selected items?"))
+                foreach (var item in listView1.SelectedItems)
+                {
+                    var lvi = (ListViewItem)item;
+                    var f = findDownloader(lvi.Text, lvi.SubItems[7].Text);
+                    if (f != null && f.dorg != null)
+                    {
+                        if (f.dorg.IsActive)
+                            continue;
+                    }
+                    else
+                    {
+                        continue;
+
+                    }
+                    var folder = f.dorg.RangeDir;
+                    removeForm(f.dorg.DownloadRequestMessage.FileName, f.dorg.DownloadRequestMessage.Url);
+                    listView1.SmallImageList.Images.RemoveAt(lvi.Index);
+                    listView1.Items.Remove(lvi);
+                    if (Directory.Exists(folder))
+                        Directory.Delete(folder, true);
+
+                }
+            saveDownloadList();
         }
     }
 }

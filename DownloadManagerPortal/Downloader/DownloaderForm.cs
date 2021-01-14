@@ -253,23 +253,20 @@ namespace DownloadManagerPortal.Downloader
         private void dorg_ErrorOccured(object sender, System.IO.ErrorEventArgs e)
         {
             handleError(e.GetException());
-           
+
         }
 
         void CloseWaiterFormIfOpen()
         {
             if (waiterForm != null)
                 waiterForm.Close();
+            var f = Application.OpenForms.Cast<Form>()
+                .Where(x=> x is WaitingNewUrl)
+                .FirstOrDefault(x =>((WaitingNewUrl)x).Id == this.dorg.Id);
+            if (f != null)
+                f.Close();
         }
-        WaitingNewUrl findWaiterForm(string id)
-        {
-            var f1 = Application.OpenForms.Cast<Form>()
-                .Where(x => x is WaitingNewUrl);
-            if (!f1.Any()) return null;
-            var f2 = f1.Select(x => (WaitingNewUrl)x)
-                .FirstOrDefault(x => x != null && x.Id == id);
-            return f2 == null ? null : f2;
-        }
+
         WaitingNewUrl waiterForm;
         public void RequestNewUrl()
         {
@@ -281,10 +278,9 @@ namespace DownloadManagerPortal.Downloader
             waiterForm.FormClosed += (m, n) => NewUrlRequested = false;
             waiterForm.Shown += (m, n) => waiterForm.Activate();
             waiterForm.TopMost = true;
-            
 
             Process.Start(dorg.DownloadRequestMessage.TabUrl);
-            waiterForm.ShowDialog();
+            waiterForm.Show();
         }
         void DownloaderForm_Shown(object sender, EventArgs e)
         {
@@ -307,14 +303,16 @@ namespace DownloadManagerPortal.Downloader
             if (Directory.Exists(dorg.RangeDir))
                 Directory.Delete(dorg.RangeDir, true);
             this.FormClosed += DownloaderForm_FormClosed;
+            timer1.Stop();
             this.Close();
+
         }
 
         void DownloaderForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             if (dorg != null && dorg.Status == DownloaderStatus.Completed)
             {
-                new DownloadCompletedForm(dorg).Show(null);
+                new DownloadCompletedForm(dorg).Show(new Form());
             }
         }
 

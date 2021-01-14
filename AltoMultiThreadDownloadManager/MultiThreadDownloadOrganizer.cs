@@ -98,6 +98,7 @@ namespace AltoMultiThreadDownloadManager
             if (Info.ContentSize < 1)
             {
                 Status = DownloaderStatus.MergingFiles;
+                Directory.CreateDirectory(SaveDir);
                 File.Delete(this.FilePath);
                 File.Move(Ranges[0].FilePath, this.FilePath);
                 Progress = 100;
@@ -109,6 +110,7 @@ namespace AltoMultiThreadDownloadManager
                       TotalBytesReceived == Info.ContentSize &&
                       !flagMerged)
             {
+                Directory.CreateDirectory(SaveDir);
                 flagMerged = true;
                 Progress = 100;
                 Status = DownloaderStatus.MergingFiles;
@@ -368,12 +370,12 @@ namespace AltoMultiThreadDownloadManager
                         cd.Download();
                     }
                 }
-                else if(reqThreads < 0)
+                else if (reqThreads < 0)
                 {
-                    var temp = cdList.Where(x=> !x.Range.IsDownloaded && !x.Range.IsIdle);
-                    if(temp.Any())
+                    var temp = cdList.Where(x => !x.Range.IsDownloaded && !x.Range.IsIdle);
+                    if (temp.Any())
                     {
-                        var first = temp.OrderByDescending(x=>x.Range.Remaining.Size).First();
+                        var first = temp.OrderByDescending(x => x.Range.Remaining.Size).First();
                         first.Stop();
                     }
                 }
@@ -464,7 +466,7 @@ namespace AltoMultiThreadDownloadManager
         /// </summary>
         public string Id { get; set; }
 
-        
+
         /// <summary>
         /// Gets the download speed
         /// </summary>
@@ -558,7 +560,7 @@ namespace AltoMultiThreadDownloadManager
         }
 
         public int NofThread;
-        
+
         public string SaveFileName { get; set; }
         public DownloadMessage DownloadRequestMessage { get; set; }
         public DownloadInfo LastInfo { get; set; }

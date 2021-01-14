@@ -49,7 +49,7 @@ namespace DownloadManagerPortal.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("lmmjhgihkikoiieafpbmgacfhcappehb")]
+        [global::System.Configuration.DefaultSettingValueAttribute("kimajdeajmdbbldmjdckapkabikgkkee")]
         public string ChromeExtensionId {
             get {
                 return ((string)(this["ChromeExtensionId"]));
@@ -61,14 +61,50 @@ namespace DownloadManagerPortal.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://chrome.google.com/webstore/devconsole/27b767b9-45e3-4717-aceb-e93739315a6" +
-            "a/kimajdeajmdbbldmjdckapkabikgkkee/edit?hl=tr")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://chrome.google.com/webstore/detail/comaltomultithreaddownloa/kimajdeajmdbb" +
+            "ldmjdckapkabikgkkee?hl=tr&authuser=0\r\n")]
         public string ExtensionUrl {
             get {
                 return ((string)(this["ExtensionUrl"]));
             }
             set {
                 this["ExtensionUrl"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SaveFolder {
+            get {
+                return ((string)(this["SaveFolder"]));
+            }
+            set {
+                this["SaveFolder"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int NofThread {
+            get {
+                return ((int)(this["NofThread"]));
+            }
+            set {
+                this["NofThread"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int Setting {
+            get {
+                return ((int)(this["Setting"]));
+            }
+            set {
+                this["Setting"] = value;
             }
         }
     }

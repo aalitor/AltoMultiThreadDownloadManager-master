@@ -6,6 +6,7 @@ using DownloadManagerPortal.SingleInstancing;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -16,6 +17,7 @@ namespace DownloadManagerPortal
 {
     public partial class DownloadCenterForm : Form, ISingleInstanceEnforcer
     {
+
         List<DownloaderForm> formlist = new List<DownloaderForm>();
         public DownloadCenterForm()
         {
@@ -24,12 +26,16 @@ namespace DownloadManagerPortal
             this.FormClosing += DownloadCenterForm_FormClosing;
             DoubleBuffering.SetDoubleBuffered(listView1);
             timer1.Tick += timer1_Tick;
-            listView1.SelectedIndexChanged += listView1_SelectedIndexChanged;
+            var saveDir = Properties.Settings.Default.SaveFolder;
+            var nofThread = Properties.Settings.Default.NofThread;
+
+            saveDir = string.IsNullOrEmpty(saveDir) ? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) : saveDir;
+            nofThread = nofThread < 1 ? 8 : nofThread;
+
+            Properties.Settings.Default.SaveFolder = saveDir;
+            Properties.Settings.Default.NofThread = nofThread;
+            Properties.Settings.Default.Save();
         }
-
-
-
-
 
         void DownloadCenterForm_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -101,7 +107,7 @@ namespace DownloadManagerPortal
         #endregion
         bool checkDownloadCompleted(DownloaderForm f)
         {
-            return f != null && f.dorg != null && f.dorg.Info != null && f.dorg.Progress == 100;
+            return f != null && f.dorg != null && f.dorg.Status == DownloaderStatus.Completed;
         }
 
         void showForm(DownloaderForm f, DownloadMessage req, bool directStart)
@@ -119,7 +125,7 @@ namespace DownloadManagerPortal
                 a.FormClosed += a_FormClosed;
                 formlist.Add(a);
                 a.Shown += a_Shown;
-                a.Show(null);
+                a.Show(new DownloadCenterForm());
             }
         }
 
@@ -143,7 +149,7 @@ namespace DownloadManagerPortal
             formlist.Add(a);
             this.Activate();
 
-            
+
         }
         public void OnMessageReceived(MessageEventArgs e)
         {
@@ -171,23 +177,25 @@ namespace DownloadManagerPortal
                 else if (completed)
                 {
                     this.Activate();
+                    f.dorg.Url = downloadRequest.Url;
+                    f.dorg.Info.Url = downloadRequest.Url;
+                    f.dorg.DownloadRequestMessage = downloadRequest;
+                    f.Show(new DownloadCenterForm());
                     var result = MessageBox.Show("Download already completed! Do you want to download again?",
                         downloadRequest.FileName, MessageBoxButtons.YesNo);
                     if (result == System.Windows.Forms.DialogResult.Yes)
                     {
-                        f.dorg.Url = downloadRequest.Url;
-                        f.dorg.Info.Url = downloadRequest.Url;
-                        f.dorg.DownloadRequestMessage = downloadRequest;
-                        f.Show(null);
                         f.HandleAlreadyCompleted();
                     }
+                    else
+                        f.Close();
                 }
                 else if (!f.dorg.IsActive)
                 {
                     Directory.CreateDirectory(f.dorg.RangeDir);
                     foreach (var item in f.dorg.Ranges)
                     {
-                        if(!File.Exists(item.FilePath))
+                        if (!File.Exists(item.FilePath))
                         {
                             item.TotalBytesReceived = 0;
                         }
@@ -208,7 +216,7 @@ namespace DownloadManagerPortal
             });
         }
 
-        
+
 
 
 
@@ -221,9 +229,12 @@ namespace DownloadManagerPortal
                 return null;
             var t = MTDOList.Where(x => x.dorg != null && x.dorg.Info != null &&
                             x.dorg.Info.ServerFileName == filename);
-
-            return t.Any() ? t.OrderByDescending(x => x.dorg.TotalBytesReceived)
-                .ThenByDescending(x => x.dorg.LastTry).First() : null;
+            if (!t.Any())
+            {
+                t = MTDOList.Where(x => x.dorg != null && x.dorg.DownloadRequestMessage != null &&
+                            x.dorg.DownloadRequestMessage.FileName == filename);
+            }
+            return t.FirstOrDefault();
         }
         internal DownloaderForm findDownloaderFromUrl(string url)
         {
@@ -232,8 +243,7 @@ namespace DownloadManagerPortal
             var t = MTDOList.Where(x => x.dorg != null && x.dorg.Info != null &&
                             x.dorg.Info.Url == url);
 
-            return t.Any() ? t.OrderByDescending(x => x.dorg.TotalBytesReceived)
-                .ThenByDescending(x => x.dorg.LastTry).First() : null;
+            return t.FirstOrDefault();
         }
         internal DownloaderForm findDownloader(string filename, string url)
         {
@@ -251,7 +261,7 @@ namespace DownloadManagerPortal
 
         internal MultiThreadDownloadOrganizer createMTDO(DownloadMessage MSG)
         {
-            var finalFolder = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            var finalFolder = Properties.Settings.Default.SaveFolder;
             var tempFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             tempFolder = Path.Combine(tempFolder, "AltoDownloadAccelerator");
             var nofThreads = 8;
@@ -293,33 +303,17 @@ namespace DownloadManagerPortal
             OnMessageReceived(new MessageEventArgs(msg));
         }
 
-        private void btnDelete_Click(object sender, EventArgs e)
-        {
-            if (listView1.SelectedItems.Count < 1)
-                return;
-            if (MessageHelper.AskYes("Are you sure to delete the selected items?")) 
-            foreach (var item in listView1.SelectedItems)
-            {
-                var lvi = (ListViewItem)item;
-                var f = findDownloader(lvi.Text, "");
-                var folder = f.dorg.RangeDir;
-                removeForm(f.dorg.DownloadRequestMessage.FileName, f.dorg.DownloadRequestMessage.Url);
-                listView1.SmallImageList.Images.RemoveAt(lvi.Index);
-                listView1.Items.Remove(lvi);
-                if (Directory.Exists(folder))
-                    Directory.Delete(folder, true);
 
-            }
-            saveDownloadList();
-        }
 
         private void btnIntegrateChrome_Click(object sender, EventArgs e)
         {
+
             if (!isAdmin())
             {
                 MessageBox.Show("You must start the program as admin to integrate. Because registry operations are necessary for integration.", "Integration failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+
             var extname = Properties.Settings.Default.ChromeExtensionName;
             var extid = Properties.Settings.Default.ChromeExtensionId;
             var extensionUrl = Properties.Settings.Default.ExtensionUrl;
@@ -328,6 +322,9 @@ namespace DownloadManagerPortal
             var hostPath = Path.Combine(currentDir, extname + ".json");
             var exePath = Assembly.GetExecutingAssembly().Location;
 
+            var appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            var appDataChromeExtPath = appData + @"\Google\Chrome\User Data\Default\Extensions\" + extid;
+
             var h = new HostExtensionIntegrator();
             h.ExePath = exePath;
             h.HostPath = hostPath;
@@ -335,9 +332,18 @@ namespace DownloadManagerPortal
 
             RegistryExtensionIntegrator.Complete(hostPath, extname);
 
-            MessageBox.Show("You must install the chrome extension in browser to complete integration if it is not installed",
-                "Integration almost ready", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            var extExists = Directory.Exists(appDataChromeExtPath) && Directory.GetDirectories(appDataChromeExtPath).Any();
 
+            if (RegistryExtensionIntegrator.CheckHost(extname, hostPath) && extExists)
+            {
+                MessageBox.Show("Completed");
+            }
+            else
+            {
+                MessageBox.Show("You must install the chrome extension in browser to complete integration if it is not installed",
+                    "Integration almost ready", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Process.Start(extensionUrl);
+            }
         }
 
         bool isAdmin()
@@ -351,18 +357,28 @@ namespace DownloadManagerPortal
             return isElevated;
         }
 
-        private void btnApplyThreads_Click(object sender, EventArgs e)
+        private void DownloadCenterForm_Resize(object sender, EventArgs e)
         {
-            var f = getSelectedItem();
-            if (f == null || f.dorg == null)
-                return;
-
-            f.dorg.NofThread = (int)nmdMaxThread.Value;
-
-            MessageBox.Show("Applied!", f.dorg.Info.ServerFileName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if (this.WindowState == FormWindowState.Minimized)
+            {
+                Hide();
+                notifyIcon1.Visible = true;
+            }
         }
 
-        
+        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            Show();
+            this.WindowState = FormWindowState.Normal;
+            notifyIcon1.Visible = false;
+        }
+
+        private void btnSettings_Click(object sender, EventArgs e)
+        {
+            new DownloadSettingsForm().ShowDialog();
+        }
+
+
 
     }
 }

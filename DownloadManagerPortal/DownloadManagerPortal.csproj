@@ -60,6 +60,12 @@
   <ItemGroup>
     <Compile Include="ChromeIntegrator\NativeMessageHost.cs" />
     <Compile Include="DoubleBuffering.cs" />
+    <Compile Include="Download Settings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Download Settings.Designer.cs">
+      <DependentUpon>Download Settings.cs</DependentUpon>
+    </Compile>
     <Compile Include="DownloadCenterForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -112,6 +118,9 @@
     <Compile Include="WaitingNewUrl.Designer.cs">
       <DependentUpon>WaitingNewUrl.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Download Settings.resx">
+      <DependentUpon>Download Settings.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DownloadCenterForm.resx">
       <DependentUpon>DownloadCenterForm.cs</DependentUpon>
     </EmbeddedResource>

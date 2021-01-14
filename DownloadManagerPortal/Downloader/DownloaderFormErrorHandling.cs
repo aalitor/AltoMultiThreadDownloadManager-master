@@ -20,7 +20,9 @@ namespace DownloadManagerPortal.Downloader
         }
         public void handleError(Exception ex)
         {
-            var webex = (WebException)ex;
+            WebException webex = null;
+            if (ex is WebException)
+                webex = (WebException)ex;
 
             if (ex is RemoteFilePropertiesChangedException)
             {
@@ -43,25 +45,32 @@ namespace DownloadManagerPortal.Downloader
                 {
 
                     var response = (HttpWebResponse)webex.Response;
-                    if (response != null)
+                    if (webex.Status == WebExceptionStatus.Timeout)
+                    {
+                        lblError.Text = "Last Error: " + ex.Message;
+                    }
+                    else if (response != null)
                     {
                         stopDownloader();
                         var status = response.StatusCode;
-                        if (status == (HttpStatusCode)403 && (dorg.Info == null || !dorg.LastInfo.Equals(dorg.getCurrentInformations()))
+                        if (status == (HttpStatusCode)403)
+                            if ((dorg.Info == null || !dorg.LastInfo.Equals(dorg.getCurrentInformations()))
                             && !NewUrlRequested && !dorg.FlagStop)
-                        {
-                            NewUrlRequested = true;
-                            MessageBox.Show("Remote file properties seems to be changed. Refresh the url");
-                            RequestNewUrl();
-                        }
+                            {
+                                NewUrlRequested = true;
+                                MessageBox.Show("Remote file properties seems to be changed. Refresh the url");
+                                RequestNewUrl();
+                            }
+                            else
+                            {
+                                stopDownloader();
+                                lblError.Text = "Last Error: " + ex.Message;
+                            }
                         else
                         {
+                            stopDownloader();
                             lblError.Text = "Last Error: " + ex.Message;
                         }
-                    }
-                    else if (webex.Status == WebExceptionStatus.Timeout)
-                    {
-                        lblError.Text = "Last Error: " + ex.Message;
                     }
                     else
                     {

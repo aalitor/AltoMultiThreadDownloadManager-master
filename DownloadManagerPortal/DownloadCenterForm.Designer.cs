@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DownloadCenterForm));
             this.btnAddDownload = new AltoControls.AltoButton();
             this.listView1 = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -43,9 +44,8 @@
             this.btnDelete = new AltoControls.AltoButton();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.btnIntegrateChrome = new AltoControls.AltoButton();
-            this.nmdMaxThread = new System.Windows.Forms.NumericUpDown();
-            this.btnApplyThreads = new AltoControls.AltoButton();
-            ((System.ComponentModel.ISupportInitialize)(this.nmdMaxThread)).BeginInit();
+            this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
+            this.btnSettings = new AltoControls.AltoButton();
             this.SuspendLayout();
             // 
             // btnAddDownload
@@ -86,7 +86,6 @@
             this.listView1.FullRowSelect = true;
             this.listView1.GridLines = true;
             this.listView1.Location = new System.Drawing.Point(13, 58);
-            this.listView1.MultiSelect = false;
             this.listView1.Name = "listView1";
             this.listView1.ShowItemToolTips = true;
             this.listView1.Size = new System.Drawing.Size(750, 221);
@@ -199,66 +198,53 @@
             this.btnIntegrateChrome.Transparency = false;
             this.btnIntegrateChrome.Click += new System.EventHandler(this.btnIntegrateChrome_Click);
             // 
-            // nmdMaxThread
+            // notifyIcon1
             // 
-            this.nmdMaxThread.Location = new System.Drawing.Point(450, 17);
-            this.nmdMaxThread.Maximum = new decimal(new int[] {
-            32,
-            0,
-            0,
-            0});
-            this.nmdMaxThread.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.nmdMaxThread.Name = "nmdMaxThread";
-            this.nmdMaxThread.Size = new System.Drawing.Size(49, 20);
-            this.nmdMaxThread.TabIndex = 14;
-            this.nmdMaxThread.Value = new decimal(new int[] {
-            8,
-            0,
-            0,
-            0});
+            this.notifyIcon1.BalloonTipText = "Alto Download Center";
+            this.notifyIcon1.BalloonTipTitle = "Alto Download Center";
+            this.notifyIcon1.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon1.Icon")));
+            this.notifyIcon1.Text = "Open Download Center";
+            this.notifyIcon1.Visible = true;
+            this.notifyIcon1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon1_MouseDoubleClick);
             // 
-            // btnApplyThreads
+            // btnSettings
             // 
-            this.btnApplyThreads.Active1 = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(168)))), ((int)(((byte)(183)))));
-            this.btnApplyThreads.Active2 = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(164)))), ((int)(((byte)(183)))));
-            this.btnApplyThreads.BackColor = System.Drawing.Color.Transparent;
-            this.btnApplyThreads.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnApplyThreads.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
-            this.btnApplyThreads.ForeColor = System.Drawing.Color.Black;
-            this.btnApplyThreads.Inactive1 = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(188)))), ((int)(((byte)(210)))));
-            this.btnApplyThreads.Inactive2 = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(167)))), ((int)(((byte)(188)))));
-            this.btnApplyThreads.Location = new System.Drawing.Point(505, 17);
-            this.btnApplyThreads.Name = "btnApplyThreads";
-            this.btnApplyThreads.Radius = 10;
-            this.btnApplyThreads.Size = new System.Drawing.Size(57, 20);
-            this.btnApplyThreads.Stroke = false;
-            this.btnApplyThreads.StrokeColor = System.Drawing.Color.Gray;
-            this.btnApplyThreads.TabIndex = 12;
-            this.btnApplyThreads.Text = "Apply";
-            this.btnApplyThreads.Transparency = false;
-            this.btnApplyThreads.Click += new System.EventHandler(this.btnApplyThreads_Click);
+            this.btnSettings.Active1 = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(168)))), ((int)(((byte)(183)))));
+            this.btnSettings.Active2 = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(164)))), ((int)(((byte)(183)))));
+            this.btnSettings.BackColor = System.Drawing.Color.Transparent;
+            this.btnSettings.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.btnSettings.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(162)));
+            this.btnSettings.ForeColor = System.Drawing.Color.Black;
+            this.btnSettings.Inactive1 = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(188)))), ((int)(((byte)(210)))));
+            this.btnSettings.Inactive2 = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(167)))), ((int)(((byte)(188)))));
+            this.btnSettings.Location = new System.Drawing.Point(544, 12);
+            this.btnSettings.Name = "btnSettings";
+            this.btnSettings.Radius = 10;
+            this.btnSettings.Size = new System.Drawing.Size(98, 25);
+            this.btnSettings.Stroke = false;
+            this.btnSettings.StrokeColor = System.Drawing.Color.Gray;
+            this.btnSettings.TabIndex = 12;
+            this.btnSettings.Text = "Settings";
+            this.btnSettings.Transparency = false;
+            this.btnSettings.Click += new System.EventHandler(this.btnSettings_Click);
             // 
             // DownloadCenterForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(775, 291);
-            this.Controls.Add(this.nmdMaxThread);
             this.Controls.Add(this.listView1);
             this.Controls.Add(this.btnIntegrateChrome);
-            this.Controls.Add(this.btnApplyThreads);
             this.Controls.Add(this.btnDelete);
             this.Controls.Add(this.btnResume);
+            this.Controls.Add(this.btnSettings);
             this.Controls.Add(this.btnAddDownload);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(791, 330);
             this.Name = "DownloadCenterForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Download Center";
-            ((System.ComponentModel.ISupportInitialize)(this.nmdMaxThread)).EndInit();
+            this.Resize += new System.EventHandler(this.DownloadCenterForm_Resize);
             this.ResumeLayout(false);
 
         }
@@ -279,7 +265,7 @@
         private System.Windows.Forms.ColumnHeader columnHeader7;
         private System.Windows.Forms.ColumnHeader columnHeader8;
         private AltoControls.AltoButton btnIntegrateChrome;
-        private System.Windows.Forms.NumericUpDown nmdMaxThread;
-        private AltoControls.AltoButton btnApplyThreads;
+        private System.Windows.Forms.NotifyIcon notifyIcon1;
+        private AltoControls.AltoButton btnSettings;
     }
 }
