@@ -31,6 +31,7 @@ void InitAndStart()
 	downloader.ProgressChanged += downloader_DownloadInfoReceived;
 	downloader.DownloadInfoReceived += downloader_ProgressChanged;
 	downloader.Completed += downloader_Completed;
+	downloader.StatusChanged += downloader_StatusChanged;
 	downloader.Start();
 }
 void downloader_DownloadInfoReceived(object sender, EventArgs e)
@@ -42,6 +43,19 @@ void downloader_DownloadInfoReceived(object sender, EventArgs e)
 	lblServerFileName.Text = downloader.Info.ServerFileName;
 	lblResumeability.Text = downloader.Info.AcceptRanges ? "Yes" : "No";
 	lblNofActiveThreads.Text = downloader.NofActiveThreads.ToString();
+}
+void downloader_StatusChanged(object sender, StatusChangedEventArgs e)
+{
+	switch(e.CurrentStatus)
+	{
+		case Status.Stopped:
+			//all threads stopped
+			//disable pause button
+			break;
+		case Status.Downloading:
+			//disable resume button
+			break;
+	}
 }
 void downloader_ProgressChanged(object sender, ProgressChangedEventArgs e)
 {
