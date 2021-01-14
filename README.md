@@ -18,7 +18,42 @@ This library provides multithreading download over Http. Using multithreading do
 <h2>What's next:</h2>
 FTP download will be supported when it is ready
 
-
+<h2>Code sample</h2>
+<pre><code>
+void InitAndStart()
+{
+	var url = "http://ipv4.download.thinkbroadband.com/100MB.zip";
+	var saveFolder = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+	var saveFileName = "default.unknown";
+	var chunkFilesFolder = Environment.GetFolderPath(Environment.SpecialFolder.AppData);
+	var nofMaxThread = 8;
+	var downloader = new MultiThreadDownloadOrganizer(url, saveFolder, saveFileName, chunkFilesFolder, nofMaxThread);
+	downloader.ProgressChanged += downloader_DownloadInfoReceived;
+	downloader.DownloadInfoReceived += downloader_ProgressChanged;
+	downloader.Completed += downloader_Completed;
+	downloader.Start();
+}
+void downloader_DownloadInfoReceived(object sender, EventArgs e)
+{
+	var downloader = (MultiThreadDownloadOrganizer)sender;
+	//You can change the save filename after informations received
+	downloader.SaveFileName = downloader.Info.ServerFileName;
+	
+	lblContentSize.Text = downloader.Info.ContentSize.ToHumanReadableSize();
+	lblServerFileName.Text = downloader.Info.ServerFileName;
+	lblResumeability.Text = downloader.Info.AcceptRanges ? "Yes" : "No";
+	lblNofActiveThreads.Text = downloader.NofActiveThreads.ToString();
+}
+void downloader_ProgressChanged(object sender, ProgressChangedEventArgs e)
+{
+	progressBar1.Value = (int)e.Progress;
+	lblSpeed.Text = downloader.Speed.ToHumanReadableSize() + "/s";
+}
+void downloader_Completed(object sender, EventArgs e)
+{
+	MessageBox.Show("Download Completed");
+}
+</code></pre>
 
 <h2>Demo Application using native messaging</h2>
 
