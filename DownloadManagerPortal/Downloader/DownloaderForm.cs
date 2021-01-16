@@ -185,21 +185,24 @@ namespace DownloadManagerPortal.Downloader
             }
             else
             {
-                if (dorg.Info != null && dorg.Info.ResumeCapability != Resumeability.Yes)
-                {
-                    var resumeYes = MessageHelper.AskYes("Download doesn't have resumeability. It will be downloaded from beginning. Do you agree?");
-                    if (resumeYes)
-                    {
-                        DownloadAgain();
-                    }
-                    else
-                        btnPauseResume.Enabled = true;
-                }
-                else
-                    dorg.Resume();
+                Resume();
             }
         }
-
+        public void Resume()
+        {
+            if (dorg.Info != null && dorg.Info.ResumeCapability != Resumeability.Yes)
+            {
+                var resumeYes = MessageHelper.AskYes("Download doesn't have resumeability. It will be downloaded from beginning. Do you agree?");
+                if (resumeYes)
+                {
+                    DownloadAgain();
+                }
+                else
+                    btnPauseResume.Enabled = true;
+            }
+            else
+                dorg.Resume();
+        }
         void btnDelete_Click(object sender, EventArgs e)
         {
             if (!MessageHelper.AskYes("Are you sure to delete the download"))

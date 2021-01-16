@@ -223,7 +223,8 @@ namespace DownloadManagerPortal
                             item.TotalBytesReceived = 0;
                         }
                     }
-                    f.dorg.Resume();
+
+                    f.Resume();
                     if (!f.Visible)
                         f.Show();
                 }
