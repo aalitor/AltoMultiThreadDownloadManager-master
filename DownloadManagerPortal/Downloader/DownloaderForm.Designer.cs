@@ -42,8 +42,9 @@
             this.txtUrl = new System.Windows.Forms.TextBox();
             this.lblError = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.segmentedProgressBar1 = new DownloadManagerPortal.Downloader.UIControls.SegmentedProgressBar();
             this.lblActiveThreads = new System.Windows.Forms.Label();
+            this.btnCancel = new AltoControls.AltoButton();
+            this.segmentedProgressBar1 = new DownloadManagerPortal.Downloader.UIControls.SegmentedProgressBar();
             this.SuspendLayout();
             // 
             // lblResumeability
@@ -69,7 +70,7 @@
             this.btnPauseResume.ForeColor = System.Drawing.Color.Black;
             this.btnPauseResume.Inactive1 = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(188)))), ((int)(((byte)(210)))));
             this.btnPauseResume.Inactive2 = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(167)))), ((int)(((byte)(188)))));
-            this.btnPauseResume.Location = new System.Drawing.Point(292, 212);
+            this.btnPauseResume.Location = new System.Drawing.Point(193, 215);
             this.btnPauseResume.Name = "btnPauseResume";
             this.btnPauseResume.Radius = 10;
             this.btnPauseResume.Size = new System.Drawing.Size(86, 25);
@@ -183,6 +184,38 @@
             this.timer1.Interval = 1;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // lblActiveThreads
+            // 
+            this.lblActiveThreads.AutoSize = true;
+            this.lblActiveThreads.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.lblActiveThreads.Location = new System.Drawing.Point(238, 139);
+            this.lblActiveThreads.Name = "lblActiveThreads";
+            this.lblActiveThreads.Size = new System.Drawing.Size(82, 13);
+            this.lblActiveThreads.TabIndex = 20;
+            this.lblActiveThreads.Text = "Active Threads:";
+            // 
+            // btnCancel
+            // 
+            this.btnCancel.Active1 = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(168)))), ((int)(((byte)(183)))));
+            this.btnCancel.Active2 = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(164)))), ((int)(((byte)(183)))));
+            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCancel.BackColor = System.Drawing.Color.Transparent;
+            this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.btnCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.btnCancel.ForeColor = System.Drawing.Color.Black;
+            this.btnCancel.Inactive1 = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(188)))), ((int)(((byte)(210)))));
+            this.btnCancel.Inactive2 = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(167)))), ((int)(((byte)(188)))));
+            this.btnCancel.Location = new System.Drawing.Point(292, 215);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Radius = 10;
+            this.btnCancel.Size = new System.Drawing.Size(86, 25);
+            this.btnCancel.Stroke = false;
+            this.btnCancel.StrokeColor = System.Drawing.Color.Gray;
+            this.btnCancel.TabIndex = 21;
+            this.btnCancel.Text = "Cancel";
+            this.btnCancel.Transparency = false;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            // 
             // segmentedProgressBar1
             // 
             this.segmentedProgressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -195,16 +228,6 @@
             this.segmentedProgressBar1.Size = new System.Drawing.Size(370, 18);
             this.segmentedProgressBar1.TabIndex = 13;
             // 
-            // lblActiveThreads
-            // 
-            this.lblActiveThreads.AutoSize = true;
-            this.lblActiveThreads.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-            this.lblActiveThreads.Location = new System.Drawing.Point(238, 139);
-            this.lblActiveThreads.Name = "lblActiveThreads";
-            this.lblActiveThreads.Size = new System.Drawing.Size(82, 13);
-            this.lblActiveThreads.TabIndex = 20;
-            this.lblActiveThreads.Text = "Active Threads:";
-            // 
             // DownloaderForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -213,6 +236,7 @@
             this.Controls.Add(this.txtUrl);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.lblResumeability);
+            this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnPauseResume);
             this.Controls.Add(this.lblBytesReceived);
             this.Controls.Add(this.lblActiveThreads);
@@ -249,5 +273,6 @@
         private System.Windows.Forms.Label lblError;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Label lblActiveThreads;
+        private AltoControls.AltoButton btnCancel;
     }
 }

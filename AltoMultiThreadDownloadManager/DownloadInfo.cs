@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Net;
 using AltoMultiThreadDownloadManager.Helpers;
+using AltoMultiThreadDownloadManager.Enums;
 
 namespace AltoMultiThreadDownloadManager
 {
@@ -16,13 +17,13 @@ namespace AltoMultiThreadDownloadManager
         /// <param name="contentSize">Content size of the remote file</param>
         /// <param name="acceptRanges">The information for if server supports resumeability or not</param>
         /// <param name="serverfn">Filename of the remote file</param>
-        public DownloadInfo(string url, long contentSize, bool acceptRanges, string serverfn)
+        public DownloadInfo(string url, long contentSize, bool acceptRanges, string serverfn, Resumeability rs)
         {
             Url = url;
             ContentSize = contentSize;
             AcceptRanges = acceptRanges;
             ServerFileName = serverfn;
-
+            ResumeCapability = rs;
         }
         /// <summary>
         /// Gets the download url
@@ -76,7 +77,9 @@ namespace AltoMultiThreadDownloadManager
 
             var acceptRanges = headers.AllKeys.Any(x => x.ToLower().Contains("range") && headers[x].Contains("bytes"));
             acceptRanges &= contentSize > 0;
-            return new DownloadInfo(url, contentSize, acceptRanges, serverFileName);
+
+            var resume = acceptRanges ? Resumeability.Unknown : Resumeability.No;
+            return new DownloadInfo(url, contentSize, acceptRanges, serverFileName, resume);
         }
 
         public override bool Equals(object obj)
@@ -99,7 +102,12 @@ namespace AltoMultiThreadDownloadManager
         }
         public DownloadInfo Clone()
         {
-            return new DownloadInfo(Url, ContentSize, AcceptRanges, ServerFileName);
+            return new DownloadInfo(Url, ContentSize, AcceptRanges, ServerFileName, ResumeCapability);
+        }
+        public Resumeability ResumeCapability
+        {
+            get;
+            set;
         }
     }
 }

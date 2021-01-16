@@ -4,6 +4,7 @@ using System.Net;
 using System.Threading;
 using AltoMultiThreadDownloadManager.EventArguments;
 using AltoMultiThreadDownloadManager.Helpers;
+using AltoMultiThreadDownloadManager.Enums;
 
 namespace AltoMultiThreadDownloadManager
 {
@@ -68,6 +69,10 @@ namespace AltoMultiThreadDownloadManager
                     Range.Status = Status = State.GetResponseStream;
 
                     ResponseReceived.Raise(this, new ResponseReceivedEventArgs(response));
+                    while (Wait)
+                    {
+                        Thread.Sleep(100);
+                    }
                     using (fileStream = FileHelper.CheckFile(Range.FilePath, Range.TotalBytesReceived > 0))
                     {
                         using (var str = response.GetResponseStream())
@@ -77,7 +82,7 @@ namespace AltoMultiThreadDownloadManager
                             var bytesRead = 0;
                             while (true)
                             {
-
+                                
 
                                 if (str != null)
                                     bytesRead = str.Read(buffer, 0, buffer.Length);
@@ -180,5 +185,6 @@ namespace AltoMultiThreadDownloadManager
         public Range Range { get; set; }
         public DownloadInfo Info { get; set; }
         public string Url { get; set; }
+        public bool Wait { get; set; }
     }
 }

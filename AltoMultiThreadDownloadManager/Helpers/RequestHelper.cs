@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net;
 using AltoMultiThreadDownloadManager.EventArguments;
+using AltoMultiThreadDownloadManager.Exceptions;
 
 namespace AltoMultiThreadDownloadManager.Helpers
 {
@@ -47,9 +48,9 @@ namespace AltoMultiThreadDownloadManager.Helpers
             var response = (HttpWebResponse)request.GetResponse();
 
             after.Raise(null, new AfterGettingResponseEventArgs(response));
+
             if (response.ContentLength != end - start + 1)
-                throw new Exception(string.Format(info.ContentSize + " Returned content size is wrong start={0}, end={1}, returned = {2}, shouldbe = {3}",
-                        start, end, response.ContentLength, end - start + 1));
+                throw new ReturnedContentSizeWrongException(start, end, response.ContentLength, end - start + 1);
 
             return response;
         }

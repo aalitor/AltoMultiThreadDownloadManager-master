@@ -1,4 +1,5 @@
 ﻿using AltoMultiThreadDownloadManager.Exceptions;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,10 +27,17 @@ namespace DownloadManagerPortal.Downloader
 
             if (ex is RemoteFilePropertiesChangedException)
             {
+                
                 if (!NewUrlRequested && !dorg.FlagStop)
                 {
                     stopDownloader();
                     NewUrlRequested = true;
+
+                    var rex = ex as RemoteFilePropertiesChangedException;
+                    Clipboard.SetText(JsonConvert.SerializeObject(rex.OriginalInfo));
+                    MessageBox.Show("handlealready");
+                    Clipboard.SetText(JsonConvert.SerializeObject(rex.CurrentInfo));
+                    MessageBox.Show(rex.OriginalInfo.Equals(rex.CurrentInfo).ToString());
                     MessageBox.Show("Remote file properties seems to be changed. Refresh the url");
                     RequestNewUrl();
                 }
@@ -47,7 +55,7 @@ namespace DownloadManagerPortal.Downloader
                     var response = (HttpWebResponse)webex.Response;
                     if (webex.Status == WebExceptionStatus.Timeout)
                     {
-                        lblError.Text = "Last Error: " + ex.Message;
+
                     }
                     else if (response != null)
                     {
@@ -80,5 +88,7 @@ namespace DownloadManagerPortal.Downloader
                 }
             }
         }
+
+
     }
 }

@@ -14,6 +14,7 @@ using SC = System.ComponentModel;
 using Newtonsoft.Json;
 using System.Threading;
 using System.Windows.Forms;
+using AltoMultiThreadDownloadManager.Enums;
 
 // ReSharper disable All
 namespace AltoMultiThreadDownloadManager
@@ -141,9 +142,28 @@ namespace AltoMultiThreadDownloadManager
         {
             if (FlagStop)
                 return;
+            var ex = e.GetException();
+            if (ex is ReturnedContentSizeWrongException)
+            {
+                if (Ranges.Count == 2)
+                {
+                    foreach (var cd in cdList)
+                    {
+                        Info.AcceptRanges = false;
+                        cd.Info.AcceptRanges = false;
+                        cd.UseChunk = false;
+                    }
+                    Ranges.RemoveAt(1);
+                    Ranges[0].End = Info.ContentSize - 1;
+                    foreach (var item in cdList.Where(x => x.Wait))
+                    {
+                        item.Wait = false;
+                    }
+                    return;
+                }
+            }
             ErrorOccured.Raise(sender, e, aop);
         }
-
         private void cd_BeforeSendingRequest(object sender, BeforeSendingRequestEventArgs e)
         {
             if (e.Request == null)
@@ -173,11 +193,25 @@ namespace AltoMultiThreadDownloadManager
                 Info = DownloadInfo.GetFromResponse(e.Response, Url);
                 LastInfo = Info.Clone();
                 cd.Info = Info.Clone();
+                cd.Wait = Info.AcceptRanges;
                 var chunkedHeader = e.Response.Headers[HttpResponseHeader.TransferEncoding];
-                UseChunk = chunkedHeader != null && chunkedHeader.ToLower() == "chunked";
+                UseChunk = Info.AcceptRanges && chunkedHeader != null && chunkedHeader.ToLower() == "chunked";
                 Ranges.First().End = Info.ContentSize - 1;
                 //NofThread = Info.AcceptRanges ? NofThread : 1;
                 DownloadInfoReceived.Raise(this, EventArgs.Empty);
+            }
+            if (NofActiveThreads > 1 && Info.AcceptRanges && Info.ResumeCapability != Resumeability.Yes)
+            {
+                Info.ResumeCapability = Resumeability.Yes;
+                foreach (var a in cdList)
+                {
+                    Info.AcceptRanges = true;
+                    a.Info.AcceptRanges = true;
+                }
+                foreach (var item in cdList.Where(x => x.Wait))
+                {
+                    item.Wait = false;
+                }
             }
             createNewThreadIfRequired();
         }
@@ -212,6 +246,7 @@ namespace AltoMultiThreadDownloadManager
             Ranges = new List<Range> { new Range(0, long.MaxValue - 1, RangeDir, Guid.NewGuid().ToString("N")) };
             var cd = CreateNewRangeDownloader(Ranges[0]);
             cd.Url = Url;
+            cd.Wait = true;
             cd.Download();
         }
         /// <summary>

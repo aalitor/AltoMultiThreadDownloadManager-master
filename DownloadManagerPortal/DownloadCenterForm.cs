@@ -1,4 +1,5 @@
 ﻿using AltoMultiThreadDownloadManager;
+using AltoMultiThreadDownloadManager.Enums;
 using AltoMultiThreadDownloadManager.NativeMessages;
 using DownloadManagerPortal.ChromeIntegrator;
 using DownloadManagerPortal.Downloader;

@@ -4,6 +4,7 @@ using AltoMultiThreadDownloadManager.FileVerification;
 using Newtonsoft.Json;
 using AltoMultiThreadDownloadManager.Helpers;
 using System.Collections.Generic;
+using AltoMultiThreadDownloadManager.Enums;
 
 namespace AltoMultiThreadDownloadManager
 {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AltoMultiThreadDownloadManager.Enums;
+using System;
 
 namespace AltoMultiThreadDownloadManager.Helpers
 {

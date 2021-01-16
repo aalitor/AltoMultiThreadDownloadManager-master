@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using System.Linq;
 using AltoMultiThreadDownloadManager;
 using System.ComponentModel;
+using AltoMultiThreadDownloadManager.Enums;
 
 namespace DownloadManagerPortal.Downloader.UIControls
 {

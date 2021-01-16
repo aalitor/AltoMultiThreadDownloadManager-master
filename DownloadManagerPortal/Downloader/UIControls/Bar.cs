@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using AltoMultiThreadDownloadManager;
+using AltoMultiThreadDownloadManager.Enums;
 
 namespace DownloadManagerPortal.Downloader.UIControls
 {

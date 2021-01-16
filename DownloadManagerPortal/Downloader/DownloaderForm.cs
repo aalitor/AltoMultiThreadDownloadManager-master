@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using AltoMultiThreadDownloadManager.Helpers;
+using AltoMultiThreadDownloadManager.Enums;
 namespace DownloadManagerPortal.Downloader
 {
     public partial class DownloaderForm : Form
@@ -36,6 +37,7 @@ namespace DownloadManagerPortal.Downloader
             this.directStart = directStart;
             rootRangeDir = mtdo.RangeDir;
             lblStatus.Text = "Last Status: " + dorg.Status.ToString();
+            txtUrl.Text = mtdo.Url;
             this.Shown += DownloaderForm_Shown;
         }
         bool flagCloseAfterStop = false;
@@ -163,7 +165,7 @@ namespace DownloadManagerPortal.Downloader
 
             if (btnPauseResume.Text == "Pause")
             {
-                if (dorg.Info != null && !dorg.Info.AcceptRanges)
+                if (dorg.Info != null && dorg.Info.ResumeCapability != Resumeability.Yes)
                 {
                     var pauseYes = MessageHelper.AskYes("Download doesn't have resumeability. Once it paused, it cannot be resumed from where it left. Do you still want to pause?");
                     if (pauseYes)
@@ -183,7 +185,7 @@ namespace DownloadManagerPortal.Downloader
             }
             else
             {
-                if (dorg.Info != null && !dorg.Info.AcceptRanges)
+                if (dorg.Info != null && dorg.Info.ResumeCapability != Resumeability.Yes)
                 {
                     var resumeYes = MessageHelper.AskYes("Download doesn't have resumeability. It will be downloaded from beginning. Do you agree?");
                     if (resumeYes)
@@ -287,7 +289,7 @@ namespace DownloadManagerPortal.Downloader
 
         private void dorg_MergingProgressChanged(object sender, AltoMultiThreadDownloadManager.EventArguments.MergingProgressChangedEventArgs e)
         {
-            progressBar1.Value = (int)(100 * e.Progress);
+            dorg.Progress = e.Progress;
         }
 
         private void dorg_ProgressChanged(object sender, AltoMultiThreadDownloadManager.EventArguments.ProgressChangedEventArgs e)
@@ -344,10 +346,10 @@ namespace DownloadManagerPortal.Downloader
                     segmentedProgressBar1.ContentLength = info.ContentSize;
 
                     btnPauseResume.Text = "Pause";
-                    btnPauseResume.Enabled = info.AcceptRanges;
+                    btnPauseResume.Enabled = info.ResumeCapability == Resumeability.Yes;
                     lblContentSize.Text = string.Format(lblContentSize.Text, info.ContentSize.ToHumanReadableSize());
                     lblServerFileName.Text = string.Format(lblServerFileName.Text, info.ServerFileName);
-                    lblResumeability.Text = string.Format(lblResumeability.Text, info.AcceptRanges);
+                    lblResumeability.Text = string.Format(lblResumeability.Text, info.ResumeCapability == Resumeability.Yes);
                 });
             }
             catch
@@ -390,11 +392,16 @@ namespace DownloadManagerPortal.Downloader
             lblBytesReceived.Text = string.Format("Bytes Received: {0} / {1}", dorg.TotalBytesReceived.ToHumanReadableSize(), dorg.Info.ContentSize.ToHumanReadableSize());
             lblContentSize.Text = string.Format("Content Size: {0}", dorg.Info.ContentSize.ToHumanReadableSize());
             lblServerFileName.Text = string.Format("Server Filename: {0}", dorg.Info.ServerFileName);
-            lblResumeability.Text = string.Format("{0}", dorg.Info.AcceptRanges ? "Yes" : "No");
+            lblResumeability.Text = string.Format("{0}", dorg.Info.ResumeCapability.ToString());
             lblResumeability.ForeColor = lblResumeability.Text == "Yes" ? Color.Green : Color.Red;
             lblActiveThreads.Text = "Active Threads: " + dorg.NofActiveThreads.ToString();
             this.Text = dorg.Info.ServerFileName;
             txtUrl.Text = dorg.Url;
+        }
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }

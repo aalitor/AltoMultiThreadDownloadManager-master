@@ -1,4 +1,4 @@
-﻿namespace AltoMultiThreadDownloadManager
+﻿namespace AltoMultiThreadDownloadManager.Enums
 {
     /// <summary>
     /// Defines possible download statuses

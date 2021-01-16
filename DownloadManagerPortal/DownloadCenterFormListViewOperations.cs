@@ -9,6 +9,7 @@ using AltoMultiThreadDownloadManager.Helpers;
 using AltoMultiThreadDownloadManager.AssociatedIcons;
 using DownloadManagerPortal.Downloader;
 using System.IO;
+using AltoMultiThreadDownloadManager.Enums;
 namespace DownloadManagerPortal
 {
     public partial class DownloadCenterForm
@@ -80,7 +81,7 @@ namespace DownloadManagerPortal
                 listView1.Items[i].SubItems[s++].Text = mtdo.Info.ContentSize.ToHumanReadableSize();
                 listView1.Items[i].SubItems[s++].Text = mtdo.Status.ToString();
                 listView1.Items[i].SubItems[s++].Text = mtdo.Speed.ToHumanReadableSize() + "/s";
-                listView1.Items[i].SubItems[s++].Text = mtdo.Info.AcceptRanges ? "Yes" : "No";
+                listView1.Items[i].SubItems[s++].Text = mtdo.Info.ResumeCapability.ToString();
                 listView1.Items[i].SubItems[s++].Text = mtdo.Url;
                 listView1.SmallImageList.Images[i] = IconReader.GetFileIcon(mtdo.FilePath, IconReader.IconSize.Small, false).ToBitmap();
                 listView1.Items[i].ImageIndex = i;
@@ -93,7 +94,7 @@ namespace DownloadManagerPortal
                 lvi.SubItems.Add(mtdo.Info.ContentSize.ToHumanReadableSize());
                 lvi.SubItems.Add(mtdo.Status.ToString());
                 lvi.SubItems.Add(mtdo.Speed.ToHumanReadableSize() + "/s");
-                lvi.SubItems.Add(mtdo.Info.AcceptRanges ? "Yes" : "No");
+                lvi.SubItems.Add(mtdo.Info.ResumeCapability.ToString());
                 lvi.SubItems.Add(mtdo.Url);
                 lvi.ImageIndex = listView1.Items.Count;
                 listView1.SmallImageList.Images.Add(IconReader.GetFileIcon(mtdo.FilePath, IconReader.IconSize.Small, false));

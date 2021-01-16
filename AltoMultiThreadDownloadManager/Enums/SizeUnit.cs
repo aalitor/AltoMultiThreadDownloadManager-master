@@ -1,5 +1,5 @@
 ﻿
-namespace AltoMultiThreadDownloadManager
+namespace AltoMultiThreadDownloadManager.Enums
 {
 	/// <summary>
 	/// Defines memory size units
