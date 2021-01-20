@@ -15,6 +15,8 @@ This library provides multithreading download over Http. Using multithreading do
 	<li>Chrome extension is included to messaging and capturing downloads</li>
 </ul>
 
+<h3><a href="https://www.nuget.org/packages/AltoMultiThreadDownloadManager/">Get library at Nuget</a></h3>
+
 <h2>What's next:</h2>
 FTP download will be supported when it is ready
 
