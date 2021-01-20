@@ -8,11 +8,10 @@ using AltoMultiThreadDownloadManager.Enums;
 
 namespace AltoMultiThreadDownloadManager
 {
-
     /// <summary>
     /// Defines partial download range
     /// </summary>
-    public class Range
+    public class HttpRange
     {
         /// <summary>
         /// Constructor for partial download range
@@ -20,7 +19,7 @@ namespace AltoMultiThreadDownloadManager
         /// <param name="start">Byte offset for the partial download</param>
         /// <param name="end">End of the range in bytes</param>
         /// <param name="saveDir">Temp directory to save the partial download</param>
-        public Range(long start, long end, string saveDir, string fileId)
+        public HttpRange(long start, long end, string saveDir, string fileId)
         {
             Start = start;
             End = end;
@@ -54,11 +53,11 @@ namespace AltoMultiThreadDownloadManager
         /// <summary>
         /// Gets the part of the range not downloaded
         /// </summary>
-        public Range Remaining
+        public HttpRange Remaining
         {
             get
             {
-                return new Range(Start + TotalBytesReceived, End, SaveDir, Guid.NewGuid().ToString("N"));
+                return new HttpRange(Start + TotalBytesReceived, End, SaveDir, Guid.NewGuid().ToString("N"));
             }
         }
         /// <summary>
@@ -110,20 +109,32 @@ namespace AltoMultiThreadDownloadManager
                 return Path.Combine(SaveDir, FileId);
             }
         }
+        /// <summary>
+        /// Gets the last action datetime
+        /// </summary>
         public DateTime LastTry { get; set; }
-
+        /// <summary>
+        /// Gets or sets the last checksum value for the partially downloaded file
+        /// </summary>
         public string LastChecksum { get; set; }
-
+        /// <summary>
+        /// Check if two object are equal
+        /// </summary>
+        /// <param name="obj">Other object to check equality</param>
+        /// <returns></returns>
         public override bool Equals(object obj)
         {
-            if(obj is Range)
+            if(obj is HttpRange)
             {
-                var r = (Range)obj;
+                var r = (HttpRange)obj;
                 return r.FileId == this.FileId;
             }
             return false;
         }
-
+        /// <summary>
+        /// Gets the hash code of the object
+        /// </summary>
+        /// <returns></returns>
         public override int GetHashCode()
         {
             return this.FileId.GetHashCode();

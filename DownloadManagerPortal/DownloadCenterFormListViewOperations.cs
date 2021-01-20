@@ -57,49 +57,54 @@ namespace DownloadManagerPortal
                 btnResume.Enabled = !f.dorg.IsActive;
                 btnDelete.Enabled = !f.dorg.IsActive;
 
-                btnResume.Text = f.dorg.Status == DownloaderStatus.Completed ? "Download again" :
-                    f.dorg.Status == DownloaderStatus.Stopped ? "Resume" : "Pause";
+                btnResume.Text = f.dorg.Status == HttpDownloaderStatus.Completed ? "Download again" :
+                    f.dorg.Status == HttpDownloaderStatus.Stopped ? "Resume" : "Pause";
 
             }
         }
-        void WriteItem(MultiThreadDownloadOrganizer mtdo)
+        void WriteItem(HttpMultiThreadDownloader mtdo)
         {
             if (mtdo == null || mtdo.Info == null)
                 return;
             var fullList = listView1.Items.Cast<ListViewItem>();
-            var itemlist = fullList.Where(x => x.Text == mtdo.Info.ServerFileName);
+            var itemlist = fullList.Where(x => x.Text == mtdo.Info.ServerFileName ||
+                                               x.SubItems[7].Text == mtdo.Info.Url);
             var i = -1;
-            var s = 1;
             if (listView1.SmallImageList == null)
                 listView1.SmallImageList = new ImageList();
+            var subitems = new string[]
+            {
+                mtdo.Info.ServerFileName,
+                mtdo.ProgressString,
+                mtdo.TotalBytesReceived.ToHumanReadableSize(),
+
+                mtdo.Info.ContentSize > 0 ? mtdo.Info.ContentSize.ToHumanReadableSize() :
+                mtdo.Status == HttpDownloaderStatus.Completed ? 
+                mtdo.TotalBytesReceived.ToHumanReadableSize() : "Unknown",
+
+                mtdo.Status.ToString(),
+                mtdo.Speed.ToHumanReadableSize() + "/s",
+                mtdo.Info.ResumeCapability.ToString(),
+                mtdo.Url
+            };
+
             if (itemlist.Any())
             {
-                i = itemlist.First().Index;
-                listView1.Items[i].Text = mtdo.Info.ServerFileName;
-                listView1.Items[i].SubItems[s++].Text = mtdo.ProgressString;
-                listView1.Items[i].SubItems[s++].Text = mtdo.TotalBytesReceived.ToHumanReadableSize();
-                listView1.Items[i].SubItems[s++].Text = mtdo.Info.ContentSize.ToHumanReadableSize();
-                listView1.Items[i].SubItems[s++].Text = mtdo.Status.ToString();
-                listView1.Items[i].SubItems[s++].Text = mtdo.Speed.ToHumanReadableSize() + "/s";
-                listView1.Items[i].SubItems[s++].Text = mtdo.Info.ResumeCapability.ToString();
-                listView1.Items[i].SubItems[s++].Text = mtdo.Url;
+                var it = itemlist.First();
+                i = it.Index;
+                for (int j = 0; j < it.SubItems.Count; j++)
+                {
+                    var a = (System.Windows.Forms.ListViewItem.ListViewSubItem)it.SubItems[j];
+                    a.Text = subitems[j];
+                }
                 listView1.SmallImageList.Images[i] = IconReader.GetFileIcon(mtdo.FilePath, IconReader.IconSize.Small, false).ToBitmap();
-                listView1.Items[i].ImageIndex = i;
             }
             else
             {
-                var lvi = new ListViewItem(mtdo.Info.ServerFileName);
-                lvi.SubItems.Add(mtdo.ProgressString);
-                lvi.SubItems.Add(mtdo.TotalBytesReceived.ToHumanReadableSize());
-                lvi.SubItems.Add(mtdo.Info.ContentSize.ToHumanReadableSize());
-                lvi.SubItems.Add(mtdo.Status.ToString());
-                lvi.SubItems.Add(mtdo.Speed.ToHumanReadableSize() + "/s");
-                lvi.SubItems.Add(mtdo.Info.ResumeCapability.ToString());
-                lvi.SubItems.Add(mtdo.Url);
-                lvi.ImageIndex = listView1.Items.Count;
                 listView1.SmallImageList.Images.Add(IconReader.GetFileIcon(mtdo.FilePath, IconReader.IconSize.Small, false));
-                listView1.Items.Add(lvi);
 
+                var lvi = new ListViewItem(subitems, listView1.Items.Count);
+                listView1.Items.Add(lvi);
             }
 
 

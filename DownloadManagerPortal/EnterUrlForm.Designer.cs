@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EnterUrlForm));
             this.txtUrl = new System.Windows.Forms.TextBox();
             this.btnStart = new AltoControls.AltoButton();
             this.SuspendLayout();
@@ -68,7 +69,9 @@
             this.Controls.Add(this.btnStart);
             this.Controls.Add(this.txtUrl);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "EnterUrlForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "EnterUrlForm";
             this.ResumeLayout(false);
             this.PerformLayout();

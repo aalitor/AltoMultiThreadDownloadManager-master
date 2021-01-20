@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DownloaderForm));
             this.lblResumeability = new System.Windows.Forms.Label();
             this.btnPauseResume = new AltoControls.AltoButton();
             this.lblBytesReceived = new System.Windows.Forms.Label();
@@ -172,7 +173,7 @@
             // 
             this.lblError.AutoSize = true;
             this.lblError.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-            this.lblError.Location = new System.Drawing.Point(5, 139);
+            this.lblError.Location = new System.Drawing.Point(238, 139);
             this.lblError.Name = "lblError";
             this.lblError.Size = new System.Drawing.Size(55, 13);
             this.lblError.TabIndex = 14;
@@ -188,7 +189,7 @@
             // 
             this.lblActiveThreads.AutoSize = true;
             this.lblActiveThreads.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-            this.lblActiveThreads.Location = new System.Drawing.Point(238, 139);
+            this.lblActiveThreads.Location = new System.Drawing.Point(5, 139);
             this.lblActiveThreads.Name = "lblActiveThreads";
             this.lblActiveThreads.Size = new System.Drawing.Size(82, 13);
             this.lblActiveThreads.TabIndex = 20;
@@ -248,8 +249,9 @@
             this.Controls.Add(this.lblContentSize);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.segmentedProgressBar1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "DownloaderForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Downloader";
             this.ResumeLayout(false);
             this.PerformLayout();

@@ -22,8 +22,8 @@ namespace DownloadManagerPortal
         }
 
 
-        MultiThreadDownloadOrganizer mtdo;
-        public DownloadCompletedForm(MultiThreadDownloadOrganizer downloader)
+        HttpMultiThreadDownloader mtdo;
+        public DownloadCompletedForm(HttpMultiThreadDownloader downloader)
         {
             InitializeComponent();
             mtdo = downloader;
@@ -44,8 +44,18 @@ namespace DownloadManagerPortal
 
         private void btnOpenFile_Click(object sender, EventArgs e)
         {
-            Process.Start(txtPath.Text);
-            this.Close();
+            try
+            {
+                Process.Start(txtPath.Text);
+            }
+            catch
+            {
+
+            }
+            finally
+            {
+                this.Close();
+            }
         }
 
         private void DownloadCompletedForm_FormClosed(object sender, FormClosedEventArgs e)

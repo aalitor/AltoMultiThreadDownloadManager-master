@@ -12,7 +12,17 @@ namespace DownloadManagerPortal
         [STAThread]
         static void Main(string[] args)
         {
-            App.Instance.Start(args, Receiver.ReadDownloadMessage());
+            MSG = Receiver.ReadDownloadMessage();
+            if (MSG != null)
+            {
+                var status = Properties.Settings.Default.ChromeIntegration ? "OK" : "NotOK";
+                Sender.OpenStandardStreamOut(status);
+            }
+
+
+            App.Instance.Start(args, MSG);
         }
+
+        public static DownloadMessage MSG;
     }
 }

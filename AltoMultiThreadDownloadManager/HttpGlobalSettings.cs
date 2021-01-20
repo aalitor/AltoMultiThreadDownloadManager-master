@@ -6,7 +6,7 @@ namespace AltoMultiThreadDownloadManager
 	/// <summary>
 	/// Provides global settings to make a correct web request
 	/// </summary>
-	internal static class GlobalSettings
+	internal static class HttpGlobalSettings
 	{
         /// <summary>
         /// Sets settings

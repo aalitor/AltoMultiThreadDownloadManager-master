@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DownloadCompletedForm));
             this.btnOpenFolder = new AltoControls.AltoButton();
             this.txtPath = new System.Windows.Forms.TextBox();
             this.btnOpenFile = new AltoControls.AltoButton();
@@ -100,6 +101,7 @@
             this.Controls.Add(this.txtPath);
             this.Controls.Add(this.btnOpenFile);
             this.Controls.Add(this.btnOpenFolder);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "DownloadCompletedForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "DownloadCompletedForm";

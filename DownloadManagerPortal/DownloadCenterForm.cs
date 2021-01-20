@@ -20,6 +20,7 @@ namespace DownloadManagerPortal
     {
 
         List<DownloaderForm> formlist = new List<DownloaderForm>();
+        bool trayIconExit = false;
         public DownloadCenterForm()
         {
             InitializeComponent();
@@ -40,6 +41,14 @@ namespace DownloadManagerPortal
 
         void DownloadCenterForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if(!trayIconExit)
+            {
+                e.Cancel = true;
+                Hide();
+                notifyIcon1.Visible = true;
+                return;
+            }
+
             if (MTDOList.Any(x => x.dorg.IsActive))
             {
                 flagCloseAfterStop = true;
@@ -58,19 +67,23 @@ namespace DownloadManagerPortal
                 notifyIcon1.Dispose();
                 notifyIcon1 = null;
             }
+
+
+            
+
         }
         bool flagCloseAfterStop = true;
         void dorg_Stopped(object sender, EventArgs e)
         {
-            if (flagCloseAfterStop && !MTDOList.Any(x => x.dorg.IsActive))
+            if (flagCloseAfterStop && !MTDOList.Any(x => x.dorg.IsActive) && trayIconExit)
             {
                 flagCloseAfterStop = false;
                 saveDownloadList();
                 notifyIcon1.Visible = false;
                 notifyIcon1.Icon = null;
                 notifyIcon1.Dispose();
-                
-                Application.Exit();
+
+                this.Close();
             }
         }
 
@@ -80,8 +93,8 @@ namespace DownloadManagerPortal
             var m = new MenuItem("Exit");
             m.Click += (a, n) =>
             {
+                trayIconExit = true;
                 this.Close();
-                Application.Exit();
             };
             cm.MenuItems.Add(m);
             notifyIcon1.ContextMenu = cm;
@@ -91,6 +104,8 @@ namespace DownloadManagerPortal
             {
                 WriteItem(item.dorg);
             }
+            if (Program.MSG != null)
+                OnMessageReceived(new MessageEventArgs(JsonConvert.SerializeObject(Program.MSG)));
         }
 
 
@@ -110,7 +125,7 @@ namespace DownloadManagerPortal
             try
             {
                 var json = Properties.Settings.Default.DownloadList;
-                var list = JsonConvert.DeserializeObject<List<MultiThreadDownloadOrganizer>>(json);
+                var list = JsonConvert.DeserializeObject<List<HttpMultiThreadDownloader>>(json);
                 if (list != null && list.Any())
                     foreach (var item in list)
                     {
@@ -127,7 +142,7 @@ namespace DownloadManagerPortal
         #endregion
         bool checkDownloadCompleted(DownloaderForm f)
         {
-            return f != null && f.dorg != null && f.dorg.Status == DownloaderStatus.Completed;
+            return f != null && f.dorg != null && f.dorg.Status == HttpDownloaderStatus.Completed;
         }
 
         void showForm(DownloaderForm f, DownloadMessage req, bool directStart)
@@ -158,6 +173,7 @@ namespace DownloadManagerPortal
         void a_FormClosed(object sender, FormClosedEventArgs e)
         {
             var a = (DownloaderForm)sender;
+            a.RequestAvailable = false;
             a.dorg.Stop();
             removeForm(a.dorg.DownloadRequestMessage.FileName, a.dorg.DownloadRequestMessage.Url);
             a = new DownloaderForm(a.dorg, false)
@@ -166,9 +182,6 @@ namespace DownloadManagerPortal
             };
             a.FormClosed += a_FormClosed;
             formlist.Add(a);
-            
-
-
         }
         public void OnMessageReceived(MessageEventArgs e)
         {
@@ -195,7 +208,8 @@ namespace DownloadManagerPortal
                 }
                 else if (f.NewUrlRequested)
                 {
-                    f.RefreshUrl(downloadRequest);
+                    if (f.Visible && f.RequestAvailable)
+                        f.RefreshUrl(downloadRequest);
                 }
                 else if (completed)
                 {
@@ -203,7 +217,8 @@ namespace DownloadManagerPortal
                     f.dorg.Url = downloadRequest.Url;
                     f.dorg.Info.Url = downloadRequest.Url;
                     f.dorg.DownloadRequestMessage = downloadRequest;
-                    f.Show();
+                    if (!f.Visible)
+                        f.Show();
                     var result = MessageBox.Show("Download already completed! Do you want to download again?",
                         downloadRequest.FileName, MessageBoxButtons.YesNo);
                     if (result == System.Windows.Forms.DialogResult.Yes)
@@ -223,10 +238,10 @@ namespace DownloadManagerPortal
                             item.TotalBytesReceived = 0;
                         }
                     }
-
-                    f.Resume();
                     if (!f.Visible)
                         f.Show();
+                    f.Resume();
+
                 }
                 else if (f.dorg.IsActive)
                 {
@@ -240,15 +255,11 @@ namespace DownloadManagerPortal
         void f_Shown(object sender, EventArgs e)
         {
             var f = sender as DownloaderForm;
-            
+
             f.Activate();
             f.Focus();
             f.ShowInTaskbar = false;
         }
-
-
-
-
 
         #region Select or remove download in list
 
@@ -289,13 +300,12 @@ namespace DownloadManagerPortal
         }
         #endregion
 
-        internal MultiThreadDownloadOrganizer createMTDO(DownloadMessage MSG)
+        internal HttpMultiThreadDownloader createMTDO(DownloadMessage MSG)
         {
             var finalFolder = Properties.Settings.Default.SaveFolder;
             var tempFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             tempFolder = Path.Combine(tempFolder, "AltoDownloadAccelerator");
-            var nofThreads = 8;
-            var dorg = new MultiThreadDownloadOrganizer(MSG.Url, finalFolder, "", tempFolder, nofThreads);
+            var dorg = new HttpMultiThreadDownloader(MSG.Url, finalFolder, "", tempFolder, Properties.Settings.Default.NofThread);
             dorg.Id = Guid.NewGuid().ToString("N");
             dorg.DownloadRequestMessage = MSG;
             return dorg;
@@ -329,6 +339,8 @@ namespace DownloadManagerPortal
                 return;
             var item = listView1.SelectedItems[0];
             var f = findDownloader(item.Text, item.SubItems[7].Text);
+            f.NewUrlRequested = false;
+            f.RequestAvailable = false;
             var msg = JsonConvert.SerializeObject(f.dorg.DownloadRequestMessage);
             OnMessageReceived(new MessageEventArgs(msg));
         }
@@ -387,15 +399,6 @@ namespace DownloadManagerPortal
             return isElevated;
         }
 
-        private void DownloadCenterForm_Resize(object sender, EventArgs e)
-        {
-            if (this.WindowState == FormWindowState.Minimized)
-            {
-                Hide();
-                notifyIcon1.Visible = true;
-            }
-        }
-
         private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             Show();
@@ -405,12 +408,23 @@ namespace DownloadManagerPortal
 
         private void btnSettings_Click(object sender, EventArgs e)
         {
-            new DownloadSettingsForm().ShowDialog();
+            var sform = new DownloadSettingsForm();
+            sform.FormClosed += sform_FormClosed;
+            sform.ShowDialog();
+        }
+
+        void sform_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            foreach (var item in formlist)
+            {
+                var d = item.dorg;
+                d.NofThread = Properties.Settings.Default.NofThread;
+            }
         }
 
         private void notifyIcon1_MouseClick(object sender, MouseEventArgs e)
         {
-            if(e.Button == System.Windows.Forms.MouseButtons.Right)
+            if (e.Button == System.Windows.Forms.MouseButtons.Right)
             {
                 notifyIcon1.ContextMenu.Show(this, Cursor.Position);
             }

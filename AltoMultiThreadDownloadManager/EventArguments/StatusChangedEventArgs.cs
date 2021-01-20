@@ -9,10 +9,10 @@ namespace AltoMultiThreadDownloadManager.EventArguments
 {
     public class StatusChangedEventArgs : EventArgs
     {
-        public DownloaderStatus OldStatus { get; set; }
-        public DownloaderStatus CurrentStatus { get; set; }
+        public HttpDownloaderStatus OldStatus { get; set; }
+        public HttpDownloaderStatus CurrentStatus { get; set; }
 
-        public StatusChangedEventArgs(DownloaderStatus oldStatus, DownloaderStatus currentStatus)
+        public StatusChangedEventArgs(HttpDownloaderStatus oldStatus, HttpDownloaderStatus currentStatus)
         {
             this.OldStatus = oldStatus;
             this.CurrentStatus = currentStatus;

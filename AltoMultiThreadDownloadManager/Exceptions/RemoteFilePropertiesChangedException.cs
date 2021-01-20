@@ -8,9 +8,9 @@ namespace AltoMultiThreadDownloadManager.Exceptions
 {
     public class RemoteFilePropertiesChangedException : Exception
     {
-        public DownloadInfo OriginalInfo { get; set; }
-        public DownloadInfo CurrentInfo { get; set; }
-        public RemoteFilePropertiesChangedException(DownloadInfo originalInfo, DownloadInfo currentInfo)
+        public HttpDownloadInfo OriginalInfo { get; set; }
+        public HttpDownloadInfo CurrentInfo { get; set; }
+        public RemoteFilePropertiesChangedException(HttpDownloadInfo originalInfo, HttpDownloadInfo currentInfo)
         {
             this.OriginalInfo = originalInfo;
             this.CurrentInfo = currentInfo;

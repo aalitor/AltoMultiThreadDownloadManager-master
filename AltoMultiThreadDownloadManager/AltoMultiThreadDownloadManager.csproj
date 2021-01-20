@@ -33,6 +33,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <Prefer32Bit>false</Prefer32Bit>
+    <DocumentationFile>bin\Debug\AltoMultiThreadDownloadManager.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <Prefer32Bit>false</Prefer32Bit>
@@ -59,8 +60,9 @@
     <Compile Include="AssociatedIcons\IconListManager.cs" />
     <Compile Include="AssociatedIcons\Shell32.cs" />
     <Compile Include="AssociatedIcons\User32.cs" />
-    <Compile Include="Enums\DownloaderStatus.cs" />
-    <Compile Include="DownloadInfo.cs" />
+    <Compile Include="Enums\HttpDownloaderStatus.cs" />
+    <Compile Include="Helpers\FtpRequestHelper.cs" />
+    <Compile Include="HttpDownloadInfo.cs" />
     <Compile Include="Enums\Resumeability.cs" />
     <Compile Include="EventArguments\AfterGettingResponseEventArgs.cs" />
     <Compile Include="EventArguments\BeforeSendingRequestEventArgs.cs" />
@@ -75,24 +77,28 @@
     <Compile Include="Helpers\FileHelper.cs" />
     <Compile Include="FileVerification\Checksum.cs" />
     <Compile Include="GlobalLock.cs" />
-    <Compile Include="GlobalSettings.cs" />
+    <Compile Include="HttpGlobalSettings.cs" />
     <Compile Include="Helpers\EventHelper.cs" />
     <Compile Include="Helpers\FileNameHelper.cs" />
-    <Compile Include="Helpers\RequestHelper.cs" />
+    <Compile Include="Helpers\HttpRequestHelper.cs" />
     <Compile Include="Helpers\SizeHelper.cs" />
-    <Compile Include="MultiThreadDownloadOrganizer.cs" />
+    <Compile Include="HttpMultiThreadDownloader.cs" />
     <Compile Include="NativeMessages\DownloadMessage.cs" />
     <Compile Include="NativeMessages\Header.cs" />
     <Compile Include="NativeMessages\Receiver.cs" />
+    <Compile Include="NativeMessages\Sender.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Range.cs" />
-    <Compile Include="RangeDownloader.cs" />
+    <Compile Include="HttpRange.cs" />
+    <Compile Include="HttpRangeDownloader.cs" />
     <Compile Include="Enums\SizeUnit.cs" />
     <Compile Include="Enums\State.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Ftp\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

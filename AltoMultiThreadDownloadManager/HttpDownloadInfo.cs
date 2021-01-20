@@ -2,13 +2,14 @@
 using System.Net;
 using AltoMultiThreadDownloadManager.Helpers;
 using AltoMultiThreadDownloadManager.Enums;
+using System.Diagnostics;
 
 namespace AltoMultiThreadDownloadManager
 {
     /// <summary>
     /// Contains the response headers info
     /// </summary>
-    public class DownloadInfo
+    public class HttpDownloadInfo
     {
         /// <summary>
         /// Gets the constructor for downloadinfo
@@ -17,7 +18,7 @@ namespace AltoMultiThreadDownloadManager
         /// <param name="contentSize">Content size of the remote file</param>
         /// <param name="acceptRanges">The information for if server supports resumeability or not</param>
         /// <param name="serverfn">Filename of the remote file</param>
-        public DownloadInfo(string url, long contentSize, bool acceptRanges, string serverfn, Resumeability rs)
+        public HttpDownloadInfo(string url, long contentSize, bool acceptRanges, string serverfn, Resumeability rs)
         {
             Url = url;
             ContentSize = contentSize;
@@ -46,9 +47,9 @@ namespace AltoMultiThreadDownloadManager
         /// </summary>
         /// <param name="url">Source url</param>
         /// <returns></returns>
-        public static DownloadInfo Get(string url)
+        public static HttpDownloadInfo Get(string url)
         {
-            using (var response = (HttpWebResponse)RequestHelper.CreateHttpRequest(url, null, true).GetResponse())
+            using (var response = (HttpWebResponse)HttpRequestHelper.CreateHttpRequest(url, null, true).GetResponse())
             {
                 return GetFromResponse(response, url);
             }
@@ -60,7 +61,7 @@ namespace AltoMultiThreadDownloadManager
         /// <param name="response">HttpWebResponse received from server</param>
         /// <param name="url">Source url</param>
         /// <returns></returns>
-        public static DownloadInfo GetFromResponse(HttpWebResponse response, string url)
+        public static HttpDownloadInfo GetFromResponse(HttpWebResponse response, string url)
         {
             var headers = response.Headers;
 
@@ -79,12 +80,14 @@ namespace AltoMultiThreadDownloadManager
             acceptRanges &= contentSize > 0;
 
             var resume = acceptRanges ? Resumeability.Unknown : Resumeability.No;
-            return new DownloadInfo(url, contentSize, acceptRanges, serverFileName, resume);
+
+            Debug.WriteLine(response.Headers[HttpResponseHeader.ETag]);
+            return new HttpDownloadInfo(url, contentSize, acceptRanges, serverFileName, resume);
         }
 
         public override bool Equals(object obj)
         {
-            var d = (DownloadInfo)obj;
+            var d = (HttpDownloadInfo)obj;
             if (d != null)
             {
                 return d.AcceptRanges == this.AcceptRanges &&
@@ -100,9 +103,9 @@ namespace AltoMultiThreadDownloadManager
                     ContentSize.GetHashCode() ^
                     ServerFileName.GetHashCode();
         }
-        public DownloadInfo Clone()
+        public HttpDownloadInfo Clone()
         {
-            return new DownloadInfo(Url, ContentSize, AcceptRanges, ServerFileName, ResumeCapability);
+            return new HttpDownloadInfo(Url, ContentSize, AcceptRanges, ServerFileName, ResumeCapability);
         }
         public Resumeability ResumeCapability
         {

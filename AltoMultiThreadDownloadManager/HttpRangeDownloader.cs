@@ -8,7 +8,7 @@ using AltoMultiThreadDownloadManager.Enums;
 
 namespace AltoMultiThreadDownloadManager
 {
-    internal class RangeDownloader
+    internal class HttpRangeDownloader
     {
         public event EventHandler<EventArgs> Completed;
         public event EventHandler<EventArgs> Stopped;
@@ -20,16 +20,14 @@ namespace AltoMultiThreadDownloadManager
         private Thread th = null;
         private HttpWebRequest request = null;
         private FileStream fileStream;
-        public RangeDownloader(Range range, DownloadInfo info = null)
+        internal HttpRangeDownloader(HttpRange range, HttpDownloadInfo info = null)
         {
             Range = range;
             Info = info;
             UseChunk = true;
         }
 
-
-
-        public void Download()
+        internal void Download()
         {
             stopFlag = false;
             th = new Thread(() =>
@@ -58,12 +56,12 @@ namespace AltoMultiThreadDownloadManager
                 Range.Status = Status = State.SendRequest;
                 Range.LastTry = DateTime.Now;
                 request = Info != null ?
-                    RequestHelper.CreateHttpRequest(Info, stOffset, endOffset, BeforeSendingRequest) :
-                    RequestHelper.CreateHttpRequest(Url, BeforeSendingRequest, true);
+                    HttpRequestHelper.CreateHttpRequest(Info, stOffset, endOffset, BeforeSendingRequest) :
+                    HttpRequestHelper.CreateHttpRequest(Url, BeforeSendingRequest, true);
                 Range.Status = Status = State.GetResponse;
 
                 using (var response = Info != null ?
-                       RequestHelper.GetRangedResponse(Info, stOffset, endOffset, request, AfterGettingResponse) :
+                       HttpRequestHelper.GetRangedResponse(Info, stOffset, endOffset, request, AfterGettingResponse) :
                        request.GetResponse() as HttpWebResponse)
                 {
                     Range.Status = Status = State.GetResponseStream;
@@ -77,7 +75,7 @@ namespace AltoMultiThreadDownloadManager
                     {
                         using (var str = response.GetResponseStream())
                         {
-                            var buffer = new byte[2048];
+                            var buffer = new byte[10*1024];
 
                             var bytesRead = 0;
                             while (true)
@@ -156,17 +154,17 @@ namespace AltoMultiThreadDownloadManager
             {
                 if (request != null)
                     request.Abort();
-                if(Range.Status == State.Downloading)
+                if(!Range.IsIdle)
                     Range.Status = Status = State.Failed;
             }
 
         }
 
-        public void Reset()
+        internal void Reset()
         {
             stopFlag = false;
         }
-        public void Stop()
+        internal void Stop()
         {
             stopFlag = true;
             if (request != null)
@@ -175,16 +173,16 @@ namespace AltoMultiThreadDownloadManager
                 th.Abort();
         }
         private volatile bool stopFlag;
-        public int TryCount { get; set; }
-        public bool UseChunk { get; set; }
-        public State Status
+        internal int TryCount { get; set; }
+        internal bool UseChunk { get; set; }
+        internal State Status
         {
             get;
             set;
         }
-        public Range Range { get; set; }
-        public DownloadInfo Info { get; set; }
-        public string Url { get; set; }
-        public bool Wait { get; set; }
+        internal HttpRange Range { get; set; }
+        internal HttpDownloadInfo Info { get; set; }
+        internal string Url { get; set; }
+        internal bool Wait { get; set; }
     }
 }

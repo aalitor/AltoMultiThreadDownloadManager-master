@@ -9,9 +9,9 @@ namespace AltoMultiThreadDownloadManager.Helpers
     /// <summary>
     /// Description of RequestHelper.
     /// </summary>
-    public static class RequestHelper
+    public static class HttpRequestHelper
     {
-        public static HttpWebRequest CreateHttpRequest(DownloadInfo info, long start, long end, EventHandler<BeforeSendingRequestEventArgs> before)
+        public static HttpWebRequest CreateHttpRequest(HttpDownloadInfo info, long start, long end, EventHandler<BeforeSendingRequestEventArgs> before)
         {
             if (start < 0 || (info.ContentSize > 0 && start >= info.ContentSize))
                 throw new Exception("Range start index is out of the bounds");
@@ -40,10 +40,11 @@ namespace AltoMultiThreadDownloadManager.Helpers
             if (initial)
                 request.AddRange(0);
             before.Raise(null, new BeforeSendingRequestEventArgs(request));
+            
             return request;
         }
 
-        public static HttpWebResponse GetRangedResponse(DownloadInfo info, long start, long end, WebRequest request, EventHandler<AfterGettingResponseEventArgs> after)
+        public static HttpWebResponse GetRangedResponse(HttpDownloadInfo info, long start, long end, WebRequest request, EventHandler<AfterGettingResponseEventArgs> after)
         {
             var response = (HttpWebResponse)request.GetResponse();
 
@@ -51,7 +52,7 @@ namespace AltoMultiThreadDownloadManager.Helpers
 
             if (response.ContentLength != end - start + 1)
                 throw new ReturnedContentSizeWrongException(start, end, response.ContentLength, end - start + 1);
-
+            
             return response;
         }
 

@@ -21,12 +21,12 @@ namespace DownloadManagerPortal.Downloader
 
         }
 
-        public MultiThreadDownloadOrganizer dorg { get; set; }
+        public HttpMultiThreadDownloader dorg { get; set; }
         public bool NewUrlRequested { get; set; }
         bool directStart;
         string rootRangeDir;
 
-        public DownloaderForm(MultiThreadDownloadOrganizer mtdo, bool directStart = true)
+        public DownloaderForm(HttpMultiThreadDownloader mtdo, bool directStart = true)
         {
             InitializeComponent();
             this.FormClosing += DownloaderForm_FormClosing;
@@ -47,6 +47,7 @@ namespace DownloadManagerPortal.Downloader
             {
                 flagCloseAfterStop = true;
                 dorg.Stop();
+                e.Cancel = true;
             }
         }
 
@@ -68,7 +69,7 @@ namespace DownloadManagerPortal.Downloader
             if (dorg == null || dorg.Info == null)
                 return;
             var json = Properties.Settings.Default.DownloadList;
-            var list = JsonConvert.DeserializeObject<List<MultiThreadDownloadOrganizer>>(json);
+            var list = JsonConvert.DeserializeObject<List<HttpMultiThreadDownloader>>(json);
             if (list != null && list.Any())
             {
                 var i = list.FindIndex(x => x != null && x.Info != null && x.Info.ServerFileName == dorg.Info.ServerFileName);
@@ -80,7 +81,7 @@ namespace DownloadManagerPortal.Downloader
             else
             {
                 if (list == null)
-                    list = new List<MultiThreadDownloadOrganizer>();
+                    list = new List<HttpMultiThreadDownloader>();
                 list.Add(dorg);
             }
 
@@ -89,37 +90,42 @@ namespace DownloadManagerPortal.Downloader
             Properties.Settings.Default.DownloadList = json;
             Properties.Settings.Default.Save();
         }
-        void setButtonStatus(DownloaderStatus status)
+        void setButtonStatus(HttpDownloaderStatus status)
         {
             lblStatus.Text = "Last Status: " + status.ToString();
             this.TopMost = false;
             switch (status)
             {
-                case DownloaderStatus.Completed:
+                case HttpDownloaderStatus.Completed:
                     btnPauseResume.Text = "Download again";
                     btnPauseResume.Enabled = true;
                     this.ControlBox = true;
                     this.Enabled = true;
                     saveMTDO();
                     break;
-                case DownloaderStatus.Downloading:
+                case HttpDownloaderStatus.Downloading:
                     btnPauseResume.Text = "Pause";
-                    btnPauseResume.Enabled = true;
+                    btnPauseResume.Enabled = dorg != null && dorg.Info != null && dorg.Info.ResumeCapability == Resumeability.Yes;
+                    btnCancel.Enabled = true;
                     this.ControlBox = true;
                     this.Enabled = true;
                     break;
-                case DownloaderStatus.MergingFiles:
-                    btnPauseResume.Enabled = false;
+                case HttpDownloaderStatus.MergingFiles:
                     this.ControlBox = false;
                     this.Enabled = false;
                     saveMTDO();
                     break;
-                case DownloaderStatus.Stopped:
+                case HttpDownloaderStatus.Stopped:
                     btnPauseResume.Text = "Resume";
                     btnPauseResume.Enabled = true;
+                    btnCancel.Enabled = true;
                     this.ControlBox = true;
                     this.Enabled = true;
                     saveMTDO();
+                    if (flagCloseAfterStop)
+                    {
+                        this.Close();
+                    }
                     break;
             }
         }
@@ -144,7 +150,7 @@ namespace DownloadManagerPortal.Downloader
             DoubleBuffering.SetDoubleBuffered(this);
             if (!directStart)
             {
-                btnPauseResume.Text = dorg.Status == DownloaderStatus.Completed ? "Download again" : "Resume";
+                btnPauseResume.Text = dorg.Status == HttpDownloaderStatus.Completed ? "Download again" : "Resume";
                 btnPauseResume.Enabled = true;
             }
             else
@@ -179,7 +185,7 @@ namespace DownloadManagerPortal.Downloader
                     dorg.Stop();
 
             }
-            else if (dorg.Status == DownloaderStatus.Completed)
+            else if (dorg.Status == HttpDownloaderStatus.Completed)
             {
                 HandleAlreadyCompleted();
             }
@@ -190,18 +196,26 @@ namespace DownloadManagerPortal.Downloader
         }
         public void Resume()
         {
-            if (dorg.Info != null && dorg.Info.ResumeCapability != Resumeability.Yes)
+            if (dorg.Info != null)
             {
-                var resumeYes = MessageHelper.AskYes("Download doesn't have resumeability. It will be downloaded from beginning. Do you agree?");
-                if (resumeYes)
+                if (dorg.Info.ResumeCapability != Resumeability.Yes)
                 {
-                    DownloadAgain();
+                    this.Show();
+                    var resumeYes = MessageHelper.AskYes("Download doesn't have resumeability. It will be downloaded from beginning. Do you agree?");
+                    if (resumeYes)
+                    {
+                        DownloadAgain();
+                    }
+                    else
+                    {
+                        this.Close();
+                        btnPauseResume.Enabled = true;
+
+                    }
                 }
                 else
-                    btnPauseResume.Enabled = true;
+                    dorg.Resume();
             }
-            else
-                dorg.Resume();
         }
         void btnDelete_Click(object sender, EventArgs e)
         {
@@ -212,23 +226,31 @@ namespace DownloadManagerPortal.Downloader
         }
         public void HandleAlreadyCompleted()
         {
-            var currentInfo = dorg.getCurrentInformations();
+            var currentInfo = dorg.GetCurrentInformations();
             if (dorg.LastInfo != null && dorg.LastInfo.Equals(currentInfo))
             {
+
                 DownloadAgain();
             }
-            else if (!NewUrlRequested)
+            else if (!RequestAvailable)
             {
-                NewUrlRequested = true;
-                MessageBox.Show("Remote file properties seems to be changed. Refresh the url", "Url expired", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                RequestNewUrl();
+                RequestAvailable = true;
+                var yesno = MessageBox.Show("Remote file properties seems to be changed. Do you want to renew url and auth data?", "Url expired", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (yesno == System.Windows.Forms.DialogResult.Yes)
+                    RequestNewUrl();
+                else
+                {
+                    NewUrlRequested = false;
+                    RequestAvailable = false;
+                    this.Close();
+                }
             }
         }
         public void DownloadAgain()
         {
             var tempFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             tempFolder = Path.Combine(tempFolder, "AltoDownloadAccelerator");
-            dorg = new MultiThreadDownloadOrganizer(dorg.Url, dorg.SaveDir, "", tempFolder, dorg.NofThread)
+            dorg = new HttpMultiThreadDownloader(dorg.Url, dorg.SaveDir, "", tempFolder, Properties.Settings.Default.NofThread)
             {
                 DownloadRequestMessage = dorg.DownloadRequestMessage,
                 Id = dorg.Id
@@ -239,51 +261,37 @@ namespace DownloadManagerPortal.Downloader
         }
         public void RefreshUrl(DownloadMessage msg)
         {
-            CloseWaiterFormIfOpen();
             dorg.Url = msg.Url;
             dorg.Info.Url = msg.Url;
             dorg.DownloadRequestMessage = msg;
             this.Activate();
-            if (dorg.Status == DownloaderStatus.Completed)
+            if (dorg.Status == HttpDownloaderStatus.Completed)
             {
                 DownloadAgain();
             }
-            else if (dorg.Status == DownloaderStatus.Stopped)
+            else if (dorg.Status == HttpDownloaderStatus.Stopped)
                 dorg.Resume();
-            NewUrlRequested = false;
 
+            btnPauseResume.Enabled = dorg != null && dorg.Info != null && dorg.Info.ResumeCapability == Resumeability.Yes;
+            btnCancel.Enabled = false;
+            NewUrlRequested = false;
+            RequestAvailable = false;
         }
         private void dorg_ErrorOccured(object sender, System.IO.ErrorEventArgs e)
         {
+
             handleError(e.GetException());
 
         }
 
-        void CloseWaiterFormIfOpen()
-        {
-            if (waiterForm != null)
-                waiterForm.Close();
-            var f = Application.OpenForms.Cast<Form>()
-                .Where(x=> x is WaitingNewUrl)
-                .FirstOrDefault(x =>((WaitingNewUrl)x).Id == this.dorg.Id);
-            if (f != null)
-                f.Close();
-        }
-
-        WaitingNewUrl waiterForm;
+        public bool RequestAvailable = false;
         public void RequestNewUrl()
         {
-
+            btnPauseResume.Enabled = false;
+            btnCancel.Enabled = false;
+            RequestAvailable = true;
             NewUrlRequested = true;
-
-            waiterForm = new WaitingNewUrl();
-            waiterForm.Id = dorg.Id;
-            waiterForm.FormClosed += (m, n) => NewUrlRequested = false;
-            waiterForm.Shown += (m, n) => waiterForm.Activate();
-            waiterForm.TopMost = true;
-
             Process.Start(dorg.DownloadRequestMessage.TabUrl);
-            waiterForm.Show();
         }
         void DownloaderForm_Shown(object sender, EventArgs e)
         {
@@ -303,8 +311,8 @@ namespace DownloadManagerPortal.Downloader
         private void dorg_Completed(object sender, EventArgs e)
         {
             btnPauseResume.Text = "Download again";
-            if (Directory.Exists(dorg.RangeDir))
-                Directory.Delete(dorg.RangeDir, true);
+            //if (Directory.Exists(dorg.RangeDir))
+            //    Directory.Delete(dorg.RangeDir, true);
             this.FormClosed += DownloaderForm_FormClosed;
             timer1.Stop();
             this.Close();
@@ -313,7 +321,7 @@ namespace DownloadManagerPortal.Downloader
 
         void DownloaderForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (dorg != null && dorg.Status == DownloaderStatus.Completed)
+            if (dorg != null && dorg.Status == HttpDownloaderStatus.Completed)
             {
                 var c = new DownloadCompletedForm(dorg);
                 c.TopMost = true;

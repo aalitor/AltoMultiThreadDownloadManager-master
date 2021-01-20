@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DownloadSettingsForm));
             this.btnSaveSettings = new AltoControls.AltoButton();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.txtSaveFolder = new System.Windows.Forms.TextBox();
@@ -35,6 +36,9 @@
             this.btnOpenFBD = new AltoControls.AltoButton();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.txtExtId = new System.Windows.Forms.TextBox();
+            this.chkChrome = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -48,7 +52,7 @@
             this.btnSaveSettings.ForeColor = System.Drawing.Color.Black;
             this.btnSaveSettings.Inactive1 = System.Drawing.Color.FromArgb(((int)(((byte)(44)))), ((int)(((byte)(188)))), ((int)(((byte)(210)))));
             this.btnSaveSettings.Inactive2 = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(167)))), ((int)(((byte)(188)))));
-            this.btnSaveSettings.Location = new System.Drawing.Point(332, 77);
+            this.btnSaveSettings.Location = new System.Drawing.Point(332, 87);
             this.btnSaveSettings.Name = "btnSaveSettings";
             this.btnSaveSettings.Radius = 10;
             this.btnSaveSettings.Size = new System.Drawing.Size(71, 25);
@@ -61,16 +65,16 @@
             // 
             // txtSaveFolder
             // 
-            this.txtSaveFolder.Location = new System.Drawing.Point(96, 10);
+            this.txtSaveFolder.Location = new System.Drawing.Point(116, 10);
             this.txtSaveFolder.Name = "txtSaveFolder";
             this.txtSaveFolder.ReadOnly = true;
-            this.txtSaveFolder.Size = new System.Drawing.Size(276, 20);
+            this.txtSaveFolder.Size = new System.Drawing.Size(256, 20);
             this.txtSaveFolder.TabIndex = 14;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(2, 13);
+            this.label1.Location = new System.Drawing.Point(4, 13);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(67, 13);
             this.label1.TabIndex = 15;
@@ -99,7 +103,7 @@
             // 
             // numericUpDown1
             // 
-            this.numericUpDown1.Location = new System.Drawing.Point(96, 36);
+            this.numericUpDown1.Location = new System.Drawing.Point(116, 62);
             this.numericUpDown1.Maximum = new decimal(new int[] {
             32,
             0,
@@ -122,17 +126,46 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(2, 39);
+            this.label2.Location = new System.Drawing.Point(4, 65);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(88, 13);
             this.label2.TabIndex = 17;
             this.label2.Text = "Connection Limit:";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(4, 39);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(107, 13);
+            this.label3.TabIndex = 20;
+            this.label3.Text = "Chrome Extension Id:";
+            // 
+            // txtExtId
+            // 
+            this.txtExtId.Location = new System.Drawing.Point(116, 36);
+            this.txtExtId.Name = "txtExtId";
+            this.txtExtId.Size = new System.Drawing.Size(256, 20);
+            this.txtExtId.TabIndex = 19;
+            // 
+            // chkChrome
+            // 
+            this.chkChrome.AutoSize = true;
+            this.chkChrome.Location = new System.Drawing.Point(4, 88);
+            this.chkChrome.Name = "chkChrome";
+            this.chkChrome.Size = new System.Drawing.Size(107, 17);
+            this.chkChrome.TabIndex = 21;
+            this.chkChrome.Text = "Integrate Chrome";
+            this.chkChrome.UseVisualStyleBackColor = true;
             // 
             // DownloadSettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(414, 117);
+            this.Controls.Add(this.chkChrome);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.txtExtId);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.numericUpDown1);
             this.Controls.Add(this.label1);
@@ -140,6 +173,7 @@
             this.Controls.Add(this.btnOpenFBD);
             this.Controls.Add(this.btnSaveSettings);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "DownloadSettingsForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Download Settings";
@@ -158,5 +192,8 @@
         private AltoControls.AltoButton btnOpenFBD;
         private System.Windows.Forms.NumericUpDown numericUpDown1;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox txtExtId;
+        private System.Windows.Forms.CheckBox chkChrome;
     }
 }

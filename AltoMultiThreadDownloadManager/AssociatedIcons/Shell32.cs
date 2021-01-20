@@ -16,7 +16,7 @@ namespace AltoMultiThreadDownloadManager.AssociatedIcons
 
     // This code has been left largely untouched from that in the CRC example. The main changes have been moving
     // the icon reading code over to the IconReader type.
-    public class Shell32
+    internal class Shell32
     {
 
         public const int MAX_PATH = 256;

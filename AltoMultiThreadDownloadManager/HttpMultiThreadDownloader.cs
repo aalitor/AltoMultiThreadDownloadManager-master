@@ -22,7 +22,7 @@ namespace AltoMultiThreadDownloadManager
     /// <summary>
     /// Multi thread downloader object class
     /// </summary>
-    public class MultiThreadDownloadOrganizer
+    public class HttpMultiThreadDownloader
     {
         /// <summary>
         /// Raises when download progress changed
@@ -63,9 +63,9 @@ namespace AltoMultiThreadDownloadManager
 
         public event EventHandler<ChecksumValidationProgressChangedEventArgs> ChecksumValidationProgressChanged;
         public event EventHandler<StatusChangedEventArgs> StatusChanged;
-        private DownloaderStatus status;
+        private HttpDownloaderStatus status;
         private Stopwatch stp = new Stopwatch();
-        private List<RangeDownloader> cdList = new List<RangeDownloader>();
+        private List<HttpRangeDownloader> cdList = new List<HttpRangeDownloader>();
         private long totalBytesMerged;
         private bool flagMerged = false;
         private System.Windows.Forms.Timer stopTimer = new System.Windows.Forms.Timer();
@@ -78,10 +78,10 @@ namespace AltoMultiThreadDownloadManager
         /// <param name="finalPath">Final save path to merge all partial files downloaded</param>
         /// <param name="rangeDir">Temporary save path for partial downloads</param>
         /// <param name="nofThread">Number of async threads to download with</param>
-        public MultiThreadDownloadOrganizer(string url, string saveDir, string saveFileName, string rangeDir, int nofThread)
+        public HttpMultiThreadDownloader(string url, string saveDir, string saveFileName, string rangeDir, int nofThread)
         {
             new GlobalLock();
-            GlobalSettings.Set();
+            HttpGlobalSettings.Set();
             Url = url;
             RangeDir = rangeDir;
             SaveDir = saveDir;
@@ -98,12 +98,12 @@ namespace AltoMultiThreadDownloadManager
         {
             if (Info.ContentSize < 1)
             {
-                Status = DownloaderStatus.MergingFiles;
+                Status = HttpDownloaderStatus.MergingFiles;
                 Directory.CreateDirectory(SaveDir);
                 File.Delete(this.FilePath);
                 File.Move(Ranges[0].FilePath, this.FilePath);
                 Progress = 100;
-                Status = DownloaderStatus.Completed;
+                Status = HttpDownloaderStatus.Completed;
                 Completed.Raise(this, EventArgs.Empty, aop);
             }
             else if (Ranges.All(x => x.IsDownloaded) &&
@@ -114,10 +114,10 @@ namespace AltoMultiThreadDownloadManager
                 Directory.CreateDirectory(SaveDir);
                 flagMerged = true;
                 Progress = 100;
-                Status = DownloaderStatus.MergingFiles;
+                Status = HttpDownloaderStatus.MergingFiles;
                 await MergePartialFiles();
                 ProgressChanged.Raise(this, new ProgressChangedEventArgs(Progress), aop);
-                Status = DownloaderStatus.Completed;
+                Status = HttpDownloaderStatus.Completed;
                 Completed.Raise(this, EventArgs.Empty, aop);
             }
             else
@@ -132,7 +132,7 @@ namespace AltoMultiThreadDownloadManager
             {
                 LastTry = DateTime.Now;
                 stopTimer.Stop();
-                Status = DownloaderStatus.Stopped;
+                Status = HttpDownloaderStatus.Stopped;
                 Stopped.Raise(this, EventArgs.Empty, aop);
             }
 
@@ -166,8 +166,6 @@ namespace AltoMultiThreadDownloadManager
         }
         private void cd_BeforeSendingRequest(object sender, BeforeSendingRequestEventArgs e)
         {
-            if (e.Request == null)
-                throw new Exception("Null web request");
             e.Request.ServicePoint.ConnectionLimit = 1000;
             if (DownloadRequestMessage != null)
             {
@@ -187,10 +185,10 @@ namespace AltoMultiThreadDownloadManager
 
         private void cd_ResponseReceived(object sender, ResponseReceivedEventArgs e)
         {
-            var cd = (RangeDownloader)sender;
+            var cd = (HttpRangeDownloader)sender;
             if (Info == null)
             {
-                Info = DownloadInfo.GetFromResponse(e.Response, Url);
+                Info = HttpDownloadInfo.GetFromResponse(e.Response, Url);
                 LastInfo = Info.Clone();
                 cd.Info = Info.Clone();
                 cd.Wait = Info.AcceptRanges;
@@ -213,6 +211,13 @@ namespace AltoMultiThreadDownloadManager
                     item.Wait = false;
                 }
             }
+            if(Info.ContentSize < 10 * 1024 + 1)
+            {
+                foreach (var item in cdList.Where(x => x.Wait))
+                {
+                    item.Wait = false;
+                }
+            }
             createNewThreadIfRequired();
         }
 
@@ -227,7 +232,7 @@ namespace AltoMultiThreadDownloadManager
 
             if (Progress == 0 || prnew != Progress)
             {
-                Status = DownloaderStatus.Downloading;
+                Status = HttpDownloaderStatus.Downloading;
                 Progress = prnew;
                 ProgressChanged.Raise(this, new ProgressChangedEventArgs(Progress), aop);
             }
@@ -243,7 +248,7 @@ namespace AltoMultiThreadDownloadManager
         public void Start()
         {
             stp.Start();
-            Ranges = new List<Range> { new Range(0, long.MaxValue - 1, RangeDir, Guid.NewGuid().ToString("N")) };
+            Ranges = new List<HttpRange> { new HttpRange(0, long.MaxValue - 1, RangeDir, Guid.NewGuid().ToString("N")) };
             var cd = CreateNewRangeDownloader(Ranges[0]);
             cd.Url = Url;
             cd.Wait = true;
@@ -280,10 +285,11 @@ namespace AltoMultiThreadDownloadManager
         }
         /// <summary>
         /// Resumes all threads after stopping
+        /// <exception cref="AltoMultiThreadDownloader.Exceptions.RemoteFilePropertiesChangedException">Thrown when download informations changed, in case of expired url or changed authentication data</exception>
         /// </summary>
         public void Resume()
         {
-            var currentInfo = getCurrentInformations();
+            var currentInfo = GetCurrentInformations();
 
             if (currentInfo == null || !currentInfo.Equals(this.Info))
             {
@@ -300,32 +306,31 @@ namespace AltoMultiThreadDownloadManager
             Resumed.Raise(this, EventArgs.Empty, aop);
 
         }
-        public bool CheckUrlStillValid()
-        {
-            var currentInfo = getCurrentInformations();
-
-            if (currentInfo == null || !currentInfo.Equals(this.Info))
-                return false;
-            return true;
-        }
-        public MultiThreadDownloadOrganizer Clone()
+        /// <summary>
+        /// Creates a clone of the downloader
+        /// </summary>
+        /// <returns></returns>
+        public HttpMultiThreadDownloader Clone()
         {
             var json = JsonConvert.SerializeObject(this);
-            return JsonConvert.DeserializeObject<MultiThreadDownloadOrganizer>(json);
+            return JsonConvert.DeserializeObject<HttpMultiThreadDownloader>(json);
         }
         #endregion
 
         #region Helper methods
-
-        public DownloadInfo getCurrentInformations()
+        /// <summary>
+        /// Gets the newest download informations in case of url expired or remote file was modified
+        /// </summary>
+        /// <returns></returns>
+        public HttpDownloadInfo GetCurrentInformations()
         {
             try
             {
-                var req = RequestHelper.CreateHttpRequest(this.Url, null, true);
+                var req = HttpRequestHelper.CreateHttpRequest(this.Url, null, true);
                 cd_BeforeSendingRequest(this, new BeforeSendingRequestEventArgs(req));
                 using (var resp = (HttpWebResponse)req.GetResponse())
                 {
-                    return DownloadInfo.GetFromResponse(resp, this.Url);
+                    return HttpDownloadInfo.GetFromResponse(resp, this.Url);
                 }
             }
             catch
@@ -359,7 +364,7 @@ namespace AltoMultiThreadDownloadManager
                             var fstart = first.Remaining.Start;
                             var fend = first.Remaining.End;
                             first.End = fstart - 1;
-                            var next = new Range(fstart, fend, RangeDir, Guid.NewGuid().ToString("N"));
+                            var next = new HttpRange(fstart, fend, RangeDir, Guid.NewGuid().ToString("N"));
                             Ranges.Add(next);
                             var cd = CreateNewRangeDownloader(next);
                             cd.Download();
@@ -399,7 +404,7 @@ namespace AltoMultiThreadDownloadManager
                         var fstart = first.End - first.Remaining.Size / 2;
                         var fend = first.End;
                         first.End = fstart - 1;
-                        var next = new Range(fstart, fend, RangeDir, Guid.NewGuid().ToString("N"));
+                        var next = new HttpRange(fstart, fend, RangeDir, Guid.NewGuid().ToString("N"));
                         Ranges.Add(next);
                         var cd = CreateNewRangeDownloader(next);
                         cd.Download();
@@ -416,9 +421,9 @@ namespace AltoMultiThreadDownloadManager
                 }
             }
         }
-        private RangeDownloader CreateNewRangeDownloader(Range c)
+        private HttpRangeDownloader CreateNewRangeDownloader(HttpRange c)
         {
-            var cd = new RangeDownloader(c, Info);
+            var cd = new HttpRangeDownloader(c, Info);
             cd.UseChunk = this.UseChunk;
             cd.Completed += cd_Completed;
             cd.Stopped += cd_Stopped;
@@ -520,7 +525,10 @@ namespace AltoMultiThreadDownloadManager
                 return Progress.ToString("0.00") + "%";
             }
         }
-        public DownloaderStatus Status
+        /// <summary>
+        /// Gets or sets the downloader status
+        /// </summary>
+        public HttpDownloaderStatus Status
         {
             get
             {
@@ -536,6 +544,9 @@ namespace AltoMultiThreadDownloadManager
                 }
             }
         }
+        /// <summary>
+        /// Gets the number of active threads
+        /// </summary>
         public int NofActiveThreads
         {
             get
@@ -545,7 +556,9 @@ namespace AltoMultiThreadDownloadManager
                         Ranges.ToList().Count(x => !x.IsIdle) : 0;
             }
         }
-
+        /// <summary>
+        /// Gets if at least one thread is active for downloading
+        /// </summary>
         public bool IsActive
         {
             get
@@ -575,30 +588,43 @@ namespace AltoMultiThreadDownloadManager
         /// <summary>
         /// Gets the ranges for partial downloads
         /// </summary>
-        public List<Range> Ranges { get; set; }
+        public List<HttpRange> Ranges { get; set; }
         /// <summary>
-        /// Gets the response headers as info
+        /// Gets the download informations: Content-Length, Resumeability, ServerFileName
         /// </summary>
-        public DownloadInfo Info { get; set; }
+        public HttpDownloadInfo Info { get; set; }
         /// <summary>
-        /// Gets the download request message that was received via NativeMessaging from an external source
-        /// e.g Chrome extension
+        /// Gets or sets the final save directory for download
         /// </summary>
         public string SaveDir { get; set; }
         /// <summary>
-        /// Gets or sets the number of max async threads
+        /// Gets the stop flag, if true it forces the download for stopping
         /// </summary>
         public bool FlagStop
         {
             get;
             private set;
         }
-
-        public int NofThread;
-
+        /// <summary>
+        /// Gets or sets the number of max async threads
+        /// </summary>
+        public int NofThread { get; set; }
+        /// <summary>
+        /// Gets or sets the final save file name for download
+        /// </summary>
         public string SaveFileName { get; set; }
+        /// <summary>
+        /// Gets or sets the download request message that was received via NativeMessaging from an external source or created manually
+        /// e.g Chrome extension
+        /// </summary>
         public DownloadMessage DownloadRequestMessage { get; set; }
-        public DownloadInfo LastInfo { get; set; }
+        /// <summary>
+        /// Stored information that was last received successfully
+        /// </summary>
+        public HttpDownloadInfo LastInfo { get; set; }
+        /// <summary>
+        /// Last action datetime for download
+        /// </summary>
         public DateTime LastTry { get; set; }
         #endregion
     }

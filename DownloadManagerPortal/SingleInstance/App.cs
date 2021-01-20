@@ -94,9 +94,6 @@ namespace DownloadManagerPortal.SingleInstancing
                 // If this is the first instance of the application, run the main form
                 if (tracker.IsFirstInstance)
                 {
-
-                    if (msg != null)
-                        return;
                     try
                     {
                         DownloadCenterForm form = (DownloadCenterForm)tracker.Enforcer;
@@ -131,7 +128,7 @@ namespace DownloadManagerPortal.SingleInstancing
                         Dispose();
                     }
                 }
-                else
+                else if (Properties.Settings.Default.ChromeIntegration)
                 {
                     if (msg != null)
                     {

@@ -245,7 +245,6 @@
             this.Name = "DownloadCenterForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Download Center";
-            this.Resize += new System.EventHandler(this.DownloadCenterForm_Resize);
             this.ResumeLayout(false);
 
         }

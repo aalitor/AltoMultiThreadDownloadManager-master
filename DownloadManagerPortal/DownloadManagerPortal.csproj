@@ -35,6 +35,9 @@
   <PropertyGroup>
     <StartupObject>DownloadManagerPortal.Program</StartupObject>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AltoControls, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\AltoControls.1.0.1\lib\AltoControls.dll</HintPath>
@@ -112,12 +115,6 @@
     <Compile Include="SingleInstance\SingleInstanceException.cs" />
     <Compile Include="SingleInstance\SingleInstanceProxy.cs" />
     <Compile Include="SingleInstance\SingleInstanceTracker.cs" />
-    <Compile Include="WaitingNewUrl.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="WaitingNewUrl.Designer.cs">
-      <DependentUpon>WaitingNewUrl.cs</DependentUpon>
-    </Compile>
     <EmbeddedResource Include="Download Settings.resx">
       <DependentUpon>Download Settings.cs</DependentUpon>
     </EmbeddedResource>
@@ -143,9 +140,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="WaitingNewUrl.resx">
-      <DependentUpon>WaitingNewUrl.cs</DependentUpon>
-    </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -166,7 +160,9 @@
       <Name>AltoMultiThreadDownloadManager</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="icon.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

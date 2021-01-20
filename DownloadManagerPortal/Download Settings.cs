@@ -22,6 +22,8 @@ namespace DownloadManagerPortal
         {
             txtSaveFolder.Text = Properties.Settings.Default.SaveFolder;
             numericUpDown1.Value = Properties.Settings.Default.NofThread;
+            txtExtId.Text = Properties.Settings.Default.ChromeExtensionId;
+            chkChrome.Checked = Properties.Settings.Default.ChromeIntegration;
         }
 
         private void btnSaveSettings_Click(object sender, EventArgs e)
@@ -31,6 +33,8 @@ namespace DownloadManagerPortal
 
             Properties.Settings.Default.SaveFolder = folder;
             Properties.Settings.Default.NofThread = nofThread;
+            Properties.Settings.Default.ChromeExtensionId = txtExtId.Text;
+            Properties.Settings.Default.ChromeIntegration = chkChrome.Checked;
             Properties.Settings.Default.Save();
             this.Close();
         }
@@ -41,7 +45,7 @@ namespace DownloadManagerPortal
             {
                 txtSaveFolder.Text = folderBrowserDialog1.SelectedPath;
             }
-            
+
         }
     }
 }

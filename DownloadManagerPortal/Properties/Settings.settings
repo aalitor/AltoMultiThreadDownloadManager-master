@@ -9,7 +9,7 @@
       <Value Profile="(Default)">com.alto.multithreaddownloadmanager</Value>
     </Setting>
     <Setting Name="ChromeExtensionId" Type="System.String" Scope="User">
-      <Value Profile="(Default)">kimajdeajmdbbldmjdckapkabikgkkee</Value>
+      <Value Profile="(Default)">lmmjhgihkikoiieafpbmgacfhcappehb</Value>
     </Setting>
     <Setting Name="ExtensionUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)">https://chrome.google.com/webstore/detail/comaltomultithreaddownloa/kimajdeajmdbbldmjdckapkabikgkkee?hl=tr&amp;authuser=0
@@ -19,10 +19,10 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="NofThread" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">8</Value>
     </Setting>
-    <Setting Name="Setting" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+    <Setting Name="ChromeIntegration" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

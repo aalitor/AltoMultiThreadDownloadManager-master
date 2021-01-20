@@ -49,7 +49,7 @@ namespace DownloadManagerPortal.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("kimajdeajmdbbldmjdckapkabikgkkee")]
+        [global::System.Configuration.DefaultSettingValueAttribute("lmmjhgihkikoiieafpbmgacfhcappehb")]
         public string ChromeExtensionId {
             get {
                 return ((string)(this["ChromeExtensionId"]));
@@ -86,7 +86,7 @@ namespace DownloadManagerPortal.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("8")]
         public int NofThread {
             get {
                 return ((int)(this["NofThread"]));
@@ -98,13 +98,13 @@ namespace DownloadManagerPortal.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int Setting {
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ChromeIntegration {
             get {
-                return ((int)(this["Setting"]));
+                return ((bool)(this["ChromeIntegration"]));
             }
             set {
-                this["Setting"] = value;
+                this["ChromeIntegration"] = value;
             }
         }
     }
