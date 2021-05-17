@@ -1,6 +1,8 @@
 ﻿using AltoMultiThreadDownloadManager.NativeMessages;
 using DownloadManagerPortal.SingleInstancing;
+using Newtonsoft.Json;
 using System;
+using System.Windows.Forms;
 
 namespace DownloadManagerPortal
 {
