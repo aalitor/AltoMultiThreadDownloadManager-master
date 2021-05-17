@@ -49,7 +49,7 @@ namespace DownloadManagerPortal.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("lmmjhgihkikoiieafpbmgacfhcappehb")]
+        [global::System.Configuration.DefaultSettingValueAttribute("kimajdeajmdbbldmjdckapkabikgkkee")]
         public string ChromeExtensionId {
             get {
                 return ((string)(this["ChromeExtensionId"]));

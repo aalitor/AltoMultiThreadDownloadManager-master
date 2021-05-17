@@ -9,7 +9,7 @@
       <Value Profile="(Default)">com.alto.multithreaddownloadmanager</Value>
     </Setting>
     <Setting Name="ChromeExtensionId" Type="System.String" Scope="User">
-      <Value Profile="(Default)">lmmjhgihkikoiieafpbmgacfhcappehb</Value>
+      <Value Profile="(Default)">kimajdeajmdbbldmjdckapkabikgkkee</Value>
     </Setting>
     <Setting Name="ExtensionUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)">https://chrome.google.com/webstore/detail/comaltomultithreaddownloa/kimajdeajmdbbldmjdckapkabikgkkee?hl=tr&amp;authuser=0
