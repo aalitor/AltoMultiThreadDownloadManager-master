@@ -29,7 +29,7 @@ void InitAndStart()
 	var saveFileName = "default.unknown";
 	var chunkFilesFolder = Environment.GetFolderPath(Environment.SpecialFolder.AppData);
 	var nofMaxThread = 8;
-	var downloader = new MultiThreadDownloadOrganizer(url, saveFolder, saveFileName, chunkFilesFolder, nofMaxThread);
+	var downloader = new HttpMultiThreadDownloader(url, saveFolder, saveFileName, chunkFilesFolder, nofMaxThread);
 	downloader.ProgressChanged += downloader_DownloadInfoReceived;
 	downloader.DownloadInfoReceived += downloader_ProgressChanged;
 	downloader.Completed += downloader_Completed;
