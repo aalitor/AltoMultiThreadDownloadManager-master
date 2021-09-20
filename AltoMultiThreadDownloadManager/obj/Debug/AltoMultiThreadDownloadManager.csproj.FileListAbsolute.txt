@@ -1,0 +1,10 @@
+C:\Users\PCDFN\Documents\GitHub\AltoMultiThreadDownloadManager-master\AltoMultiThreadDownloadManager\bin\Debug\AltoMultiThreadDownloadManager.dll.config
+C:\Users\PCDFN\Documents\GitHub\AltoMultiThreadDownloadManager-master\AltoMultiThreadDownloadManager\bin\Debug\AltoMultiThreadDownloadManager.XML
+C:\Users\PCDFN\Documents\GitHub\AltoMultiThreadDownloadManager-master\AltoMultiThreadDownloadManager\bin\Debug\AltoMultiThreadDownloadManager.dll
+C:\Users\PCDFN\Documents\GitHub\AltoMultiThreadDownloadManager-master\AltoMultiThreadDownloadManager\bin\Debug\AltoMultiThreadDownloadManager.pdb
+C:\Users\PCDFN\Documents\GitHub\AltoMultiThreadDownloadManager-master\AltoMultiThreadDownloadManager\bin\Debug\Newtonsoft.Json.dll
+C:\Users\PCDFN\Documents\GitHub\AltoMultiThreadDownloadManager-master\AltoMultiThreadDownloadManager\bin\Debug\Newtonsoft.Json.xml
+C:\Users\PCDFN\Documents\GitHub\AltoMultiThreadDownloadManager-master\AltoMultiThreadDownloadManager\obj\Debug\AltoMultiThreadDownloadManager.csprojResolveAssemblyReference.cache
+C:\Users\PCDFN\Documents\GitHub\AltoMultiThreadDownloadManager-master\AltoMultiThreadDownloadManager\obj\Debug\AltoMultiThreadDownloadManager.dll
+C:\Users\PCDFN\Documents\GitHub\AltoMultiThreadDownloadManager-master\AltoMultiThreadDownloadManager\obj\Debug\AltoMultiThreadDownloadManager.pdb
+C:\Users\PCDFN\Documents\GitHub\AltoMultiThreadDownloadManager-master\AltoMultiThreadDownloadManager\bin\Debug\AltoControls.dll

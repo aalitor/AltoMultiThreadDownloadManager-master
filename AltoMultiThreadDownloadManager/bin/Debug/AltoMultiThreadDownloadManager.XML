@@ -1,0 +1,835 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>AltoMultiThreadDownloadManager</name>
+    </assembly>
+    <members>
+        <member name="T:AltoMultiThreadDownloadManager.AssociatedIcons.IconReader">
+            <summary>
+            Provides static methods to read system icons for both folders and files.
+            </summary>
+            <example>
+            <code>IconReader.GetFileIcon("c:\\general.xls");</code>
+            </example>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.AssociatedIcons.IconReader.GetFileIcon(System.String,AltoMultiThreadDownloadManager.AssociatedIcons.IconReader.IconSize,System.Boolean)">
+            <summary>
+            Returns an icon for a given file - indicated by the name parameter.
+            </summary>
+            <param name="name">Pathname for file.</param>
+            <param name="size">Large or small</param>
+            <param name="linkOverlay">Whether to include the link icon</param>
+            <returns>System.Drawing.Icon</returns>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.AssociatedIcons.IconReader.GetFolderIcon(AltoMultiThreadDownloadManager.AssociatedIcons.IconReader.IconSize,AltoMultiThreadDownloadManager.AssociatedIcons.IconReader.FolderType)">
+            <summary>
+            Used to access system folder icons.
+            </summary>
+            <param name="size">Specify large or small icons.</param>
+            <param name="folderType">Specify open or closed FolderType.</param>
+            <returns>System.Drawing.Icon</returns>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.AssociatedIcons.IconReader.IconSize">
+            <summary>
+            Options to specify the size of icons to return.
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.AssociatedIcons.IconReader.IconSize.Large">
+            <summary>
+            Specify large icon - 32 pixels by 32 pixels.
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.AssociatedIcons.IconReader.IconSize.Small">
+            <summary>
+            Specify small icon - 16 pixels by 16 pixels.
+            </summary>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.AssociatedIcons.IconReader.FolderType">
+            <summary>
+            Options to specify whether folders should be in the open or closed state.
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.AssociatedIcons.IconReader.FolderType.Open">
+            <summary>
+            Specify open folder.
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.AssociatedIcons.IconReader.FolderType.Closed">
+            <summary>
+            Specify closed folder.
+            </summary>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.AssociatedIcons.IconListManager">
+            <summary>
+            Maintains a list of currently added file extensions
+            </summary>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.AssociatedIcons.IconListManager.#ctor(System.Windows.Forms.ImageList,AltoMultiThreadDownloadManager.AssociatedIcons.IconReader.IconSize)">
+            <summary>
+            Creates an instance of <c>IconListManager</c> that will add icons to a single <c>ImageList</c> using the
+            specified <c>IconSize</c>.
+            </summary>
+            <param name="imageList"><c>ImageList</c> to add icons to.</param>
+            <param name="iconSize">Size to use (either 32 or 16 pixels).</param>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.AssociatedIcons.IconListManager.#ctor(System.Windows.Forms.ImageList,System.Windows.Forms.ImageList)">
+            <summary>
+            Creates an instance of IconListManager that will add icons to two <c>ImageList</c> types. The two
+            image lists are intended to be one for large icons, and the other for small icons.
+            </summary>
+            <param name="smallImageList">The <c>ImageList</c> that will hold small icons.</param>
+            <param name="largeImageList">The <c>ImageList</c> that will hold large icons.</param>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.AssociatedIcons.IconListManager.AddExtension(System.String,System.Int32)">
+            <summary>
+            Used internally, adds the extension to the hashtable, so that its value can then be returned.
+            </summary>
+            <param name="Extension"><c>String</c> of the file's extension.</param>
+            <param name="ImageListPosition">Position of the extension in the <c>ImageList</c>.</param>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.AssociatedIcons.IconListManager.AddFileIcon(System.String)">
+            <summary>
+            Called publicly to add a file's icon to the ImageList.
+            </summary>
+            <param name="filePath">Full path to the file.</param>
+            <returns>Integer of the icon's position in the ImageList</returns>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.AssociatedIcons.IconListManager.ClearLists">
+            <summary>
+            Clears any <c>ImageLists</c> that <c>IconListManager</c> is managing.
+            </summary>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.AssociatedIcons.Shell32">
+            <summary>
+            Wraps necessary Shell32.dll structures and functions required to retrieve Icon Handles using SHGetFileInfo. Code
+            courtesy of MSDN Cold Rooster Consulting case study.
+            </summary>
+            
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.AssociatedIcons.User32">
+            <summary>
+            Wraps necessary functions imported from User32.dll. Code courtesy of MSDN Cold Rooster Consulting example.
+            </summary>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.AssociatedIcons.User32.DestroyIcon(System.IntPtr)">
+            <summary>
+            Provides access to function required to delete handle. This method is used internally
+            and is not required to be called separately.
+            </summary>
+            <param name="hIcon">Pointer to icon handle.</param>
+            <returns>N/A</returns>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.Enums.HttpDownloaderStatus">
+            <summary>
+            Provides statuses for http download
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.Enums.HttpDownloaderStatus.Stopped">
+            <summary>
+            Assigned when user calls Stop and all threads are idle
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.Enums.HttpDownloaderStatus.Downloading">
+            <summary>
+            At least one thread is downloading
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.Enums.HttpDownloaderStatus.Completed">
+            <summary>
+            All threads completed downloading completely and partial files merged
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.Enums.HttpDownloaderStatus.Starting">
+            <summary>
+            Starting initial downloading
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.Enums.HttpDownloaderStatus.InfoReceived">
+            <summary>
+            Assigned right after the download informations received
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.Enums.HttpDownloaderStatus.MergingFiles">
+            <summary>
+            Assigned when partial files are started merging
+            </summary>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.HttpDownloadInfo">
+            <summary>
+            Contains the response headers info
+            </summary>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.HttpDownloadInfo.#ctor(System.String,System.Int64,System.Boolean,System.String,AltoMultiThreadDownloadManager.Enums.Resumeability)">
+            <summary>
+            Gets the constructor for downloadinfo
+            </summary>
+            <param name="url">Url of the source</param>
+            <param name="contentSize">Content size of the remote file</param>
+            <param name="acceptRanges">The information for if server supports resumeability or not</param>
+            <param name="serverfn">Filename of the remote file</param>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.HttpDownloadInfo.Get(System.String)">
+            <summary>
+            Gets the download info using url only
+            </summary>
+            <param name="url">Source url</param>
+            <returns></returns>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.HttpDownloadInfo.GetFromResponse(System.Net.HttpWebResponse,System.String)">
+            <summary>
+            Gets the download info both url and response
+            </summary>
+            <param name="response">HttpWebResponse received from server</param>
+            <param name="url">Source url</param>
+            <returns></returns>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpDownloadInfo.Url">
+            <summary>
+            Gets the download url
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpDownloadInfo.ContentSize">
+            <summary>
+            Gets the Content-Size
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpDownloadInfo.AcceptRanges">
+            <summary>
+            Gets if download supports resumeability
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpDownloadInfo.ServerFileName">
+            <summary>
+            Gets the filename that server sent
+            </summary>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.Enums.Resumeability">
+            <summary>
+            Provides status for resume capability
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.Enums.Resumeability.Yes">
+            <summary>
+            Supports resume
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.Enums.Resumeability.No">
+            <summary>
+            Does not support resume
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.Enums.Resumeability.Unknown">
+            <summary>
+            The resume property is unknown
+            </summary>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.EventArguments.AfterGettingResponseEventArgs">
+            <summary>
+            Event arguments for after getting response
+            </summary>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.EventArguments.AfterGettingResponseEventArgs.#ctor(System.Net.HttpWebResponse)">
+            <summary>
+            Constructor for event arguments
+            </summary>
+            <param name="response">Response received after request</param>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.EventArguments.AfterGettingResponseEventArgs.Response">
+            <summary>
+            Gets or sets the HttpWebResponse received
+            </summary>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.EventArguments.BeforeSendingRequestEventArgs">
+            <summary>
+            Event arguments for before request sent
+            </summary>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.EventArguments.BeforeSendingRequestEventArgs.#ctor(System.Net.HttpWebRequest)">
+            <summary>
+            Constructor for event arguments
+            </summary>
+            <param name="req">Request that will be sent</param>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.EventArguments.BeforeSendingRequestEventArgs.Request">
+            <summary>
+            Gets or sets the HttpWebRequest
+            </summary>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.EventArguments.MergingProgressChangedEventArgs">
+            <summary>
+            Event arguments for file merging event
+            </summary>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.EventArguments.MergingProgressChangedEventArgs.#ctor(System.Double)">
+            <summary>
+            Constructor for progress changed arguments
+            </summary>
+            <param name="progress">Progress for file merging process; max = 100</param>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.EventArguments.MergingProgressChangedEventArgs.Progress">
+            <summary>
+            Gets or sets the progress value
+            </summary>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.EventArguments.ProgressChangedEventArgs">
+            <summary>
+            Event arguments for file downloading progress changed event
+            </summary>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.EventArguments.ProgressChangedEventArgs.#ctor(System.Double)">
+            <summary>
+            Constructor for event arguments
+            </summary>
+            <param name="progress">Progress value for download</param>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.EventArguments.ProgressChangedEventArgs.Progress">
+            <summary>
+            Gets or sets the progress value
+            </summary>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.EventArguments.ResponseReceivedEventArgs">
+            <summary>
+            Event arguments for response received event
+            </summary>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.EventArguments.ResponseReceivedEventArgs.#ctor(System.Net.HttpWebResponse)">
+            <summary>
+            Constructor for event arguments
+            </summary>
+            <param name="response">Response received from server</param>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.EventArguments.ResponseReceivedEventArgs.Response">
+            <summary>
+            Gets or sets the response
+            </summary>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.Helpers.FileHelper">
+            <summary>
+            Description of FileHelper.
+            </summary>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.Helpers.FileHelper.CheckFile(System.String,System.Boolean)">
+            <summary>
+            Checks and creates filestream according to the file if exists or not to append or not
+            </summary>
+            <param name="filePath">Filepath to check</param>
+            <param name="append">Check file to append bytes or not</param>
+            <returns></returns>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.FileVerification.Checksum">
+            <summary>
+            Provides method to calculate Md5 checksum for files
+            </summary>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.FileVerification.Checksum.CalculateMD5(System.String)">
+            <summary>
+            Calculates Md5 value for given filename
+            </summary>
+            <param name="filename">Filename to calculate Md5</param>
+            <returns></returns>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.GlobalLock">
+            <summary>
+            Provides lock object to make downloads thread safe
+            </summary>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.GlobalLock.#ctor">
+            <summary>
+            Creates a new lock object
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.GlobalLock.Locker">
+            <summary>
+            Gets the lock object
+            </summary>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.HttpGlobalSettings">
+            <summary>
+            Provides global settings to make a correct web request
+            </summary>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.HttpGlobalSettings.Set">
+            <summary>
+            Sets settings
+            </summary>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.Helpers.EventHelper">
+            <summary>
+            Provides method to raise event
+            </summary>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.Helpers.EventHelper.Raise``1(System.EventHandler{``0},System.Object,``0)">
+            <summary>
+            Raises event if not null
+            </summary>
+            <typeparam name="T">Event arguments class derived from EventArgs</typeparam>
+            <param name="ev">Event handler to raise</param>
+            <param name="sender">Sender object</param>
+            <param name="e">Event arguments class object</param>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.Helpers.FileNameHelper">
+            <summary>
+            Provides method to get the corrent filename that server sent
+            </summary>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.Helpers.FileNameHelper.GetFileName(System.Net.HttpWebResponse)">
+            <summary>
+            Gets the filename from response
+            </summary>
+            <param name="resp">Response received from server</param>
+            <returns></returns>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.Helpers.HttpRequestHelper">
+            <summary>
+            Description of RequestHelper.
+            </summary>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.Helpers.SizeHelper">
+            <summary>
+            Provides memory size conversion methods
+            </summary>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.Helpers.SizeHelper.ToHumanReadableSize(System.Int64)">
+            <summary>
+            Converts from bytes unit to best fitted size
+            </summary>
+            <param name="byteLen">Amount of bytes to convert</param>
+            <returns></returns>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.Helpers.SizeHelper.ToHumanReadableSize(System.Int32)">
+            <summary>
+            Converts from bytes unit to best fitted size
+            </summary>
+            <param name="byteLen">Amount of bytes to convert</param>
+            <returns></returns>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.Helpers.SizeHelper.Convert(System.Int64,AltoMultiThreadDownloadManager.Enums.SizeUnit,AltoMultiThreadDownloadManager.Enums.SizeUnit)">
+            <summary>
+            Converts from source unit to given unit
+            </summary>
+            <param name="value">Size amount to convert</param>
+            <param name="from">Convert from</param>
+            <param name="to">Convert to</param>
+            <returns></returns>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader">
+            <summary>
+            Multi thread downloader object class
+            </summary>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.#ctor(System.String,System.String,System.String,System.String,System.Int32)">
+            <summary>
+            Calls constructor for the downloader object
+            </summary>
+            <param name="url">URL of the source</param>
+            <param name="finalPath">Final save path to merge all partial files downloaded</param>
+            <param name="rangeDir">Temporary save path for partial downloads</param>
+            <param name="nofThread">Number of async threads to download with</param>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.Start">
+            <summary>
+            Start the download with initial request, do not call this to resume
+            </summary>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.Stop">
+            <summary>
+            Stops all threads, to ensure stopping; wait for Stopped event
+            </summary>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.Resume">
+            <summary>
+            Resumes all threads after stopping
+            <exception cref="!:AltoMultiThreadDownloader.Exceptions.RemoteFilePropertiesChangedException">Thrown when download informations changed, in case of expired url or changed authentication data</exception>
+            </summary>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.Clone">
+            <summary>
+            Creates a clone of the downloader
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.GetCurrentInformations">
+            <summary>
+            Gets the newest download informations in case of url expired or remote file was modified
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="E:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.ProgressChanged">
+            <summary>
+            Raises when download progress changed
+            </summary>
+        </member>
+        <member name="E:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.Completed">
+            <summary>
+            Raised when download completed but this doesn't mean partial files merged
+            </summary>
+        </member>
+        <member name="E:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.Stopped">
+            <summary>
+            Raises when all download threads completely stopped
+            </summary>
+        </member>
+        <member name="E:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.Resumed">
+            <summary>
+            Raises when all download threads resumed
+            </summary>
+        </member>
+        <member name="E:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.DownloadInfoReceived">
+            <summary>
+            Raised when response headers received for the first initial request
+            </summary>
+        </member>
+        <member name="E:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.ErrorOccured">
+            <summary>
+            Raised when any of the download thread failed
+            </summary>
+        </member>
+        <member name="E:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.BeforeSendingRequest">
+            <summary>
+            Raised when before sending any of the download request
+            </summary>
+        </member>
+        <member name="E:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.MergingProgressChanged">
+            <summary>
+            Raised when merging progress changed
+            </summary>
+        </member>
+        <member name="E:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.MergeCompleted">
+            <summary>
+            Raised when download completed and partial files merged
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.TotalBytesReceived">
+            <summary>
+            Total bytes calculated by summing all bytes received from async threads
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.Id">
+            <summary>
+            Unique downloader id
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.Speed">
+            <summary>
+            Gets the download speed
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.Progress">
+            <summary>
+            Gets the download progress as two precision percentage value
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.ProgressString">
+            <summary>
+            Gets progress percentage string as #.##%
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.Status">
+            <summary>
+            Gets or sets the downloader status
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.NofActiveThreads">
+            <summary>
+            Gets the number of active threads
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.IsActive">
+            <summary>
+            Gets if at least one thread is active for downloading
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.FilePath">
+            <summary>
+            Gets or sets final save path
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.RangeDir">
+            <summary>
+            Gets the temporary save path for partial downloads
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.Url">
+            <summary>
+            Gets the download url
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.Ranges">
+            <summary>
+            Gets the ranges for partial downloads
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.Info">
+            <summary>
+            Gets the download informations: Content-Length, Resumeability, ServerFileName
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.SaveDir">
+            <summary>
+            Gets or sets the final save directory for download
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.FlagStop">
+            <summary>
+            Gets the stop flag, if true it forces the download for stopping
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.NofThread">
+            <summary>
+            Gets or sets the number of max async threads
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.SaveFileName">
+            <summary>
+            Gets or sets the final save file name for download
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.DownloadRequestMessage">
+            <summary>
+            Gets or sets the download request message that was received via NativeMessaging from an external source or created manually
+            e.g Chrome extension
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.LastInfo">
+            <summary>
+            Stored information that was last received successfully
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpMultiThreadDownloader.LastTry">
+            <summary>
+            Last action datetime for download
+            </summary>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.NativeMessages.DownloadMessage">
+            <summary>
+            Contains download information got from external
+            </summary>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.NativeMessages.DownloadMessage.GetWebHeaders">
+            <summary>
+            Converts headers to header collection
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.NativeMessages.DownloadMessage.FileSize">
+            <summary>
+            Remote file size for download in external application
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.NativeMessages.DownloadMessage.Url">
+            <summary>
+            Remote url for download in external application
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.NativeMessages.DownloadMessage.FileName">
+            <summary>
+            Remote filename for download in external application
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.NativeMessages.DownloadMessage.Headers">
+            <summary>
+            Request headers for download in external application
+            </summary>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.NativeMessages.Header">
+            <summary>
+            Header-Value pair
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.NativeMessages.Header.Name">
+            <summary>
+            header name
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.NativeMessages.Header.Value">
+            <summary>
+            header value
+            </summary>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.NativeMessages.Receiver">
+            <summary>
+            Provides methods to get native message from external application
+            </summary>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.NativeMessages.Receiver.ProcessMessage(Newtonsoft.Json.Linq.JObject)">
+            <summary>
+            Extracts text message from native message
+            </summary>
+            <param name="data">The native message data</param>
+            <returns></returns>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.NativeMessages.Receiver.Read">
+            <summary>
+            Reads the native message using stdio
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.NativeMessages.Receiver.ReadDownloadMessage">
+            <summary>
+            Gets the native message as parsed to DownloadMessage
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.HttpRange">
+            <summary>
+            Defines partial download range
+            </summary>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.HttpRange.#ctor(System.Int64,System.Int64,System.String,System.String)">
+            <summary>
+            Constructor for partial download range
+            </summary>
+            <param name="start">Byte offset for the partial download</param>
+            <param name="end">End of the range in bytes</param>
+            <param name="saveDir">Temp directory to save the partial download</param>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.HttpRange.Equals(System.Object)">
+            <summary>
+            Check if two object are equal
+            </summary>
+            <param name="obj">Other object to check equality</param>
+            <returns></returns>
+        </member>
+        <member name="M:AltoMultiThreadDownloadManager.HttpRange.GetHashCode">
+            <summary>
+            Gets the hash code of the object
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpRange.Start">
+            <summary>
+            Gets the start of the range
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpRange.End">
+            <summary>
+            Gets the end of the range
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpRange.TotalBytesReceived">
+            <summary>
+            Gets the total bytes received for download
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpRange.IsDownloaded">
+            <summary>
+            Checks if range completely downloaded
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpRange.FileId">
+            <summary>
+            Gets the unique file id for the range using Guid
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpRange.Size">
+            <summary>
+            Gets the range size in bytes
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpRange.Status">
+            <summary>
+            Gets the partial range status when downloading or not
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpRange.IsIdle">
+            <summary>
+            Checks if range is stopped, failed or completed
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpRange.SaveDir">
+            <summary>
+            Gets the temp directory to save
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpRange.FilePath">
+            <summary>
+            Gets the full save path
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpRange.LastTry">
+            <summary>
+            Gets the last action datetime
+            </summary>
+        </member>
+        <member name="P:AltoMultiThreadDownloadManager.HttpRange.LastChecksum">
+            <summary>
+            Gets or sets the last checksum value for the partially downloaded file
+            </summary>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.Enums.SizeUnit">
+            <summary>
+            Defines memory size units
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.Enums.SizeUnit.Byte">
+            <summary>
+            Bytes unit
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.Enums.SizeUnit.Kb">
+            <summary>
+            Kilobyte
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.Enums.SizeUnit.Mb">
+            <summary>
+            Megabyte
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.Enums.SizeUnit.Gb">
+            <summary>
+            Gigabyte
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.Enums.SizeUnit.Tb">
+            <summary>
+            Terabyte
+            </summary>
+        </member>
+        <member name="T:AltoMultiThreadDownloadManager.Enums.State">
+            <summary>
+            Defines possible download statuses
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.Enums.State.SendRequest">
+            <summary>
+            Sending Request
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.Enums.State.GetResponse">
+            <summary>
+            Starting getting response
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.Enums.State.GetResponseStream">
+            <summary>
+            Started getting response stream
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.Enums.State.Downloading">
+            <summary>
+            Downloading
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.Enums.State.Stopped">
+            <summary>
+            Stopped
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.Enums.State.Completed">
+            <summary>
+            Range completed
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.Enums.State.Failed">
+            <summary>
+            Range downloading failed 
+            </summary>
+        </member>
+        <member name="F:AltoMultiThreadDownloadManager.Enums.State.None">
+            <summary>
+            Initial status when range created
+            </summary>
+        </member>
+    </members>
+</doc>
