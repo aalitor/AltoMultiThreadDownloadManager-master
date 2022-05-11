@@ -21,7 +21,8 @@ This library provides multithreading download over Http. Using multithreading do
 FTP download will be supported when it is ready
 
 <h2>Code sample</h2>
-<pre><code>
+
+````csharp
 void InitAndStart()
 {
 	var url = "http://ipv4.download.thinkbroadband.com/100MB.zip";
@@ -68,7 +69,7 @@ void downloader_Completed(object sender, EventArgs e)
 {
 	MessageBox.Show("Download Completed");
 }
-</code></pre>
+````
 
 <h2>Demo Application using native messaging</h2>
 
